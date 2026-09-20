@@ -1,0 +1,21 @@
+# Stage 1: Runtime Base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS base
+WORKDIR /app
+EXPOSE 5000
+ENV ASPNETCORE_URLS=http://+:5000
+
+# Stage 2: SDK Build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+COPY ["Lms.Gateway/Lms.Gateway.csproj", "Lms.Gateway/"]
+RUN dotnet restore "Lms.Gateway/Lms.Gateway.csproj"
+
+COPY Lms.Gateway/ Lms.Gateway/
+WORKDIR "/src/Lms.Gateway"
+RUN dotnet publish "Lms.Gateway.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+# Stage 3: Final Production Image
+FROM base AS final
+WORKDIR /app
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "Lms.Gateway.dll"]

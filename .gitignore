@@ -1,0 +1,73 @@
+# =============================================================================
+# Root .gitignore for Accounting LMS
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 1. Environment & Private Secrets (CRITICAL)
+# -----------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+secrets.json
+appsettings*.local.json
+
+# -----------------------------------------------------------------------------
+# 2. .NET / C# Build Artifacts
+# -----------------------------------------------------------------------------
+[Bb]in/
+[Oo]bj/
+**/bin/
+**/obj/
+*.user
+*.userosscache
+*.suo
+*.userprefs
+*.sln.docstates
+.vs/
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/settings.json
+!.vscode/extensions.json
+BenchmarkDotNet.Artifacts/
+TestResults/
+coverage*.json
+coverage*.cobertura.xml
+
+# -----------------------------------------------------------------------------
+# 3. User Uploads & Media (Privacy / Data Protection)
+# -----------------------------------------------------------------------------
+backend/Lms.Api/wwwroot/uploads/*
+!backend/Lms.Api/wwwroot/uploads/.gitkeep
+!backend/Lms.Api/wwwroot/uploads/**/.gitkeep
+
+# -----------------------------------------------------------------------------
+# 4. Node / Angular / Frontend
+# -----------------------------------------------------------------------------
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+.angular/
+**/.angular/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# -----------------------------------------------------------------------------
+# 5. OS & System Files
+# -----------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.bak
+*.swp
+*~

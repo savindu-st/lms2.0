@@ -1,0 +1,58 @@
+services:
+  lms-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.api
+    container_name: lms-api
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=${DATABASE_CONNECTION_STRING}
+      - Jwt__SecretKey=${JWT_SECRET_KEY}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+    volumes:
+      - lms_uploads:/app/wwwroot/uploads
+    networks:
+      - lms-network
+
+  lms-gateway:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.gateway
+    container_name: lms-gateway
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ReverseProxy__Clusters__backend-api__Destinations__api-instance__Address=http://lms-api:5001
+      - Jwt__SecretKey=${JWT_SECRET_KEY}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+    depends_on:
+      - lms-api
+    networks:
+      - lms-network
+
+  lms-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: lms-frontend
+    restart: unless-stopped
+    ports:
+      - "4200:80"
+    depends_on:
+      - lms-gateway
+    networks:
+      - lms-network
+
+volumes:
+  lms_uploads:
+    name: lms_uploads
+
+networks:
+  lms-network:
+    name: lms-network
+    driver: bridge
