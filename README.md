@@ -194,6 +194,3 @@ dotnet test Lms.Tests/Lms.Tests.csproj
 
 ---
 
-## 📄 License
-
-This project is licensed under the MIT License.
