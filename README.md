@@ -10,14 +10,14 @@ The backend implements **Clean Architecture (Ports and Adapters)** fronted by a 
 
 ```mermaid
 graph TD
-    Client[Browser / Angular Frontend :4200] -->|HTTP / CORS| Gateway[Lms.Gateway :5000]
+    Client["Browser / Angular Frontend :4200"] -->|HTTP / CORS| Gateway["Lms.Gateway :5000"]
 
     subgraph GatewayEdge ["Lms.Gateway (:5000 - YARP)"]
-        CORS[Centralized CORS]
-        RL[Tiered Rate Limiter: Auth vs API]
-        JWT[Edge JWT Token Validation]
-        Limits[100MB Upload Limits & 60s Timeout]
-        YarpProxy[YARP Reverse Proxy Engine]
+        CORS["Centralized CORS"]
+        RL["Tiered Rate Limiter: Auth vs API"]
+        JWT["Edge JWT Token Validation"]
+        Limits["100MB Upload Limits & 60s Timeout"]
+        YarpProxy["YARP Reverse Proxy Engine"]
     end
 
     Gateway --> CORS
@@ -27,8 +27,8 @@ graph TD
     Limits --> YarpProxy
 
     subgraph InternalServices ["Internal Docker Network"]
-        YarpProxy -->|Forward /api/** & /swagger/**| ApiService[Lms.Api :5001]
-        YarpProxy -->|Forward /uploads/**| StaticFiles[Lms.Api :5001 (/uploads)]
+        YarpProxy -->|Forward /api/** & /swagger/**| ApiService["Lms.Api :5001"]
+        YarpProxy -->|Forward /uploads/**| StaticFiles["Lms.Api :5001 (/uploads)"]
         Volume[("Named Volume: lms_uploads")]
         ApiService --> Volume
     end
