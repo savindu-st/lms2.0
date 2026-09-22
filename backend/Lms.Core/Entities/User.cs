@@ -16,4 +16,5 @@ public class User
     public ICollection<Payment> Payments { get; set; } = new List<Payment>();
     public ICollection<QuizAttempt> QuizAttempts { get; set; } = new List<QuizAttempt>();
     public ICollection<AssignmentSubmission> Submissions { get; set; } = new List<AssignmentSubmission>();
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 }

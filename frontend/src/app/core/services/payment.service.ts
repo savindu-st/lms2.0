@@ -10,10 +10,6 @@ export class PaymentService {
   private http = inject(HttpClient);
   private apiUrl = 'http://localhost:5000/api';
 
-  instantCheckout(data: { courseId: string; cardHolderName: string; cardNumberLast4?: string }): Observable<Payment> {
-    return this.http.post<Payment>(`${this.apiUrl}/student/checkout/instant`, data);
-  }
-
   submitBankTransfer(data: {
     courseId: string;
     transactionRef: string;

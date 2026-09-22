@@ -13,7 +13,7 @@ export interface User {
 }
 
 export interface AuthResponse {
-  token: string;
+  token?: string;
   user: User;
 }
 
@@ -212,6 +212,14 @@ export interface BankDetails {
   routingOrSwift: string;
   branchName: string;
   transferInstructions: string;
+  isConfigured?: boolean;
+}
+
+export interface Branding {
+  academyName: string;
+  instructorName: string;
+  instructorTitle: string;
+  bankDetails: BankDetails;
 }
 
 export interface TeacherAnalytics {

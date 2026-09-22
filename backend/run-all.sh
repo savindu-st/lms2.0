@@ -7,8 +7,9 @@ cd "$SCRIPT_DIR"
 
 # Load .env if present
 if [ -f "$SCRIPT_DIR/../.env" ]; then
-    echo "Loading environment variables from .env..."
-    export $(grep -v '^#' "$SCRIPT_DIR/../.env" | xargs)
+    set -a
+    source "$SCRIPT_DIR/../.env"
+    set +a
     if [ -n "$DATABASE_CONNECTION_STRING" ]; then
         export ConnectionStrings__DefaultConnection="$DATABASE_CONNECTION_STRING"
     fi
@@ -20,6 +21,18 @@ if [ -f "$SCRIPT_DIR/../.env" ]; then
     fi
     if [ -n "$JWT_AUDIENCE" ]; then
         export Jwt__Audience="$JWT_AUDIENCE"
+    fi
+    if [ -n "$ACADEMY_NAME" ]; then
+        export Academy__Name="$ACADEMY_NAME"
+    fi
+    if [ -n "$TEACHER_EMAIL" ]; then
+        export Teacher__Email="$TEACHER_EMAIL"
+    fi
+    if [ -n "$TEACHER_PASSWORD" ]; then
+        export Teacher__Password="$TEACHER_PASSWORD"
+    fi
+    if [ -n "$TEACHER_FULL_NAME" ]; then
+        export Teacher__FullName="$TEACHER_FULL_NAME"
     fi
 fi
 

@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { SystemService } from '../../../core/services/system.service';
 
 @Component({
   selector: 'app-navbar',
@@ -10,21 +11,23 @@ import { AuthService } from '../../../core/services/auth.service';
   template: `
     <nav class="navbar">
       <div class="container nav-container">
+        <!-- Brand Mark -->
         <a routerLink="/" class="nav-brand">
-          <div class="brand-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <div class="brand-logo">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
               <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-              <line x1="8" y1="7" x2="16" y2="7"></line>
-              <line x1="8" y1="11" x2="14" y2="11"></line>
+              <line x1="9" y1="7" x2="15" y2="7"></line>
+              <line x1="9" y1="11" x2="13" y2="11"></line>
             </svg>
           </div>
-          <div class="brand-text">
-            <span class="brand-title">Vance Academy</span>
-            <span class="brand-subtitle">Accounting & Finance</span>
+          <div class="brand-meta">
+            <span class="brand-title">{{ systemService.academyName() }}</span>
+            <span class="brand-sub">Academy</span>
           </div>
         </a>
 
+        <!-- Nav Links -->
         <div class="nav-links">
           <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
             Catalog
@@ -45,7 +48,7 @@ import { AuthService } from '../../../core/services/auth.service';
                 Course Studio
               </a>
               <a routerLink="/teacher/payments" routerLinkActive="active" class="nav-link">
-                Verification Desk
+                Bank Verification
               </a>
               <a routerLink="/teacher/students" routerLinkActive="active" class="nav-link">
                 Student Roster
@@ -57,33 +60,22 @@ import { AuthService } from '../../../core/services/auth.service';
           }
         </div>
 
+        <!-- User Menu / CTA -->
         <div class="nav-actions">
-          <!-- Demo quick switch pills -->
-          <div class="demo-pills" title="Quick demo switch">
-            <button
-              (click)="quickSwitch('student')"
-              class="demo-btn"
-              [class.active-role]="authService.isLoggedIn() && authService.isStudent()">
-              Demo Student
-            </button>
-            <button
-              (click)="quickSwitch('teacher')"
-              class="demo-btn"
-              [class.active-role]="authService.isLoggedIn() && authService.isTeacher()">
-              Demo Teacher
-            </button>
-          </div>
-
           @if (authService.isLoggedIn()) {
-            <div class="user-menu">
-              <div class="user-info">
+            <div class="user-pill">
+              <div class="user-avatar">
+                {{ userInitials() }}
+              </div>
+              <div class="user-details">
                 <span class="user-name">{{ authService.currentUser()?.fullName }}</span>
-                <span class="role-badge" [class.badge-teacher]="authService.isTeacher()">
+                <span class="user-role" [class.is-teacher]="authService.isTeacher()">
+                  <span class="status-dot"></span>
                   {{ authService.isTeacher() ? 'Instructor' : 'Student' }}
                 </span>
               </div>
-              <button (click)="logout()" class="btn-logout" title="Log out">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <button (click)="logout()" class="btn-logout" title="Sign out" aria-label="Sign out">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                   <polyline points="16 17 21 12 16 7"></polyline>
                   <line x1="21" y1="12" x2="9" y2="12"></line>
@@ -102,19 +94,18 @@ import { AuthService } from '../../../core/services/auth.service';
   `,
   styles: [`
     .navbar {
-      background: rgba(255, 255, 255, 0.95);
+      height: 64px;
+      background: rgba(255, 255, 255, 0.88);
       backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border-subtle);
       position: sticky;
       top: 0;
       z-index: 100;
-      height: 72px;
-      display: flex;
-      align-items: center;
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
     }
 
     .nav-container {
+      height: 100%;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -124,176 +115,178 @@ import { AuthService } from '../../../core/services/auth.service';
     .nav-brand {
       display: flex;
       align-items: center;
-      gap: 0.85rem;
+      gap: 0.65rem;
       text-decoration: none;
+      color: inherit;
     }
 
-    .brand-icon {
-      width: 42px;
-      height: 42px;
+    .brand-logo {
+      width: 34px;
+      height: 34px;
       border-radius: var(--radius-md);
-      background: linear-gradient(135deg, #4f46e5 0%, #10b981 100%);
+      background: var(--primary);
+      color: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #ffffff;
-      box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25);
+      box-shadow: var(--shadow-xs);
     }
 
-    .brand-text {
+    .brand-meta {
       display: flex;
       flex-direction: column;
+      line-height: 1.2;
     }
 
     .brand-title {
-      font-weight: 800;
-      font-size: 1.15rem;
+      font-size: 0.9375rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
       color: var(--text-primary);
-      letter-spacing: -0.02em;
     }
 
-    .brand-subtitle {
-      font-size: 0.72rem;
-      font-weight: 700;
+    .brand-sub {
+      font-size: 0.6875rem;
+      font-weight: 600;
       color: var(--text-muted);
-      letter-spacing: 0.05em;
       text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.25rem;
     }
 
     .nav-link {
-      padding: 0.5rem 0.9rem;
-      font-size: 0.9rem;
-      font-weight: 600;
+      padding: 0.4rem 0.75rem;
+      border-radius: var(--radius-md);
+      font-size: 0.8125rem;
+      font-weight: 500;
       color: var(--text-secondary);
-      border-radius: var(--radius-sm);
-      transition: var(--transition);
       text-decoration: none;
+      transition: var(--transition);
     }
 
     .nav-link:hover {
       color: var(--text-primary);
-      background: #f1f5f9;
+      background: var(--bg-subtle);
     }
 
     .nav-link.active {
-      color: var(--primary);
-      background: var(--primary-light);
+      color: var(--text-primary);
+      background: #e4e4e7;
+      font-weight: 600;
     }
 
     .nav-actions {
       display: flex;
       align-items: center;
-      gap: 1.25rem;
     }
 
-    .demo-pills {
+    .user-pill {
       display: flex;
       align-items: center;
-      background: #f1f5f9;
-      padding: 3px;
-      border-radius: var(--radius-full);
-      border: 1px solid var(--border-subtle);
-    }
-
-    .demo-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-secondary);
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 0.35rem 0.75rem;
-      border-radius: var(--radius-full);
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .demo-btn:hover {
-      color: var(--text-primary);
-    }
-
-    .demo-btn.active-role {
-      background: #ffffff;
-      color: #0284c7;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .user-menu {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .user-info {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-    }
-
-    .user-name {
-      font-size: 0.875rem;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-
-    .role-badge {
-      font-size: 0.68rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: #059669;
-    }
-
-    .role-badge.badge-teacher {
-      color: #d97706;
-    }
-
-    .btn-logout {
+      gap: 0.65rem;
+      padding: 0.25rem 0.35rem 0.25rem 0.65rem;
       background: #ffffff;
       border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
-      border-radius: var(--radius-sm);
-      padding: 0.45rem;
-      cursor: pointer;
+      border-radius: var(--radius-full);
+      box-shadow: var(--shadow-xs);
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-full);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+    }
+
+    .user-details {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+    }
+
+    .user-name {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      max-width: 130px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-role {
+      font-size: 0.6875rem;
+      font-weight: 500;
+      color: var(--emerald);
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .user-role.is-teacher {
+      color: var(--amber);
+    }
+
+    .status-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .btn-logout {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-full);
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
       transition: var(--transition);
+      margin-left: 0.25rem;
     }
 
     .btn-logout:hover {
-      background: #fff1f2;
-      border-color: #fecdd3;
-      color: #e11d48;
+      background: var(--rose-light);
+      border-color: var(--rose-border);
+      color: var(--rose);
     }
 
     .auth-btns {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.5rem;
     }
   `]
 })
 export class NavbarComponent {
   authService = inject(AuthService);
+  systemService = inject(SystemService);
   router = inject(Router);
 
-  quickSwitch(role: 'student' | 'teacher') {
-    this.authService.quickLoginAs(role).subscribe({
-      next: () => {
-        if (role === 'teacher') {
-          this.router.navigate(['/teacher/courses']);
-        } else {
-          this.router.navigate(['/student/my-courses']);
-        }
-      },
-      error: (err) => console.error('Quick login failed', err)
-    });
+  userInitials(): string {
+    const name = this.authService.currentUser()?.fullName || 'U';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
   }
 
   logout() {

@@ -19,42 +19,6 @@ public class PaymentServiceTests
     }
 
     [Fact]
-    public async Task InstantCheckout_EnrollsStudent_AndGeneratesInvoice()
-    {
-        // Arrange
-        using var context = CreateDbContext();
-        var student = new User { FullName = "Alex Reynolds", Email = "alex@test.com" };
-        var course = new Course { Title = "Balance Sheet Mastery", Price = 129.00m, AccessDurationDays = 45 };
-        context.Users.Add(student);
-        context.Courses.Add(course);
-        await context.SaveChangesAsync();
-
-        var enrollmentService = new EnrollmentService(context);
-        var paymentService = new PaymentService(context, enrollmentService);
-
-        var checkoutDto = new InstantCheckoutDto
-        {
-            CourseId = course.Id,
-            CardHolderName = "Alex Reynolds",
-            CardNumberLast4 = "4242"
-        };
-
-        // Act
-        var payment = await paymentService.ProcessInstantCheckoutAsync(student.Id, checkoutDto);
-
-        // Assert
-        Assert.NotNull(payment);
-        Assert.Equal(PaymentStatus.Completed, payment.Status);
-        Assert.Equal(129.00m, payment.Amount);
-        Assert.NotNull(payment.Invoice);
-        Assert.StartsWith("INV-", payment.Invoice.InvoiceNumber);
-
-        // Verify active enrollment was created
-        var isEnrolled = await enrollmentService.IsEnrolledAndValidAsync(student.Id, course.Id);
-        Assert.True(isEnrolled);
-    }
-
-    [Fact]
     public async Task SubmitBankTransfer_CreatesPendingPayment()
     {
         // Arrange

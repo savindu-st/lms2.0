@@ -101,25 +101,6 @@ public class StudentPortalController : ControllerBase
         }
     }
 
-    [HttpPost("checkout/instant")]
-    public async Task<ActionResult<PaymentDto>> InstantCheckout([FromBody] InstantCheckoutDto dto)
-    {
-        var studentId = GetCurrentUserId();
-        try
-        {
-            var payment = await _paymentService.ProcessInstantCheckoutAsync(studentId, dto);
-            return Ok(payment);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { message = ex.Message });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-    }
-
     [HttpPost("checkout/bank-transfer")]
     public async Task<ActionResult<PaymentDto>> SubmitBankTransfer([FromBody] BankTransferSubmitDto dto)
     {

@@ -137,14 +137,12 @@ graph TD
 
 ---
 
-## 🔑 Demo Seed Accounts
+## 🔑 Administrator & Teacher Provisioning
 
-The database auto-seeds sample accounting courses and starter accounts upon first connection:
-
-| Role | Email | Password |
-| :--- | :--- | :--- |
-| **Teacher / Admin** | `teacher@accountingacademy.com` | `Teacher@123` |
-| **Student** | `student@accountingacademy.com` | `Student@123` |
+The system operates cleanly with zero synthetic mock data:
+- **Teacher / Admin Account**: Configured securely via `.env` (`TEACHER_EMAIL`, `TEACHER_PASSWORD`, `TEACHER_FULL_NAME`). The backend provisions and synchronizes this account on startup. Teachers cannot register via the public registration form.
+- **Student Accounts**: Students register individually via the standard sign-up flow (`/register`) to enroll in published courses.
+- **Database Reset / Purge Tool**: Run `./backend/scripts/wipe_database.sh` to purge all tables and reset the teacher account at any time.
 
 ---
 

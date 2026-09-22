@@ -5,52 +5,21 @@ using Lms.Core.Interfaces;
 using Lms.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
+using Microsoft.Extensions.Configuration;
+
 namespace Lms.Infrastructure.Services;
 
 public class PaymentService : IPaymentService
 {
     private readonly AppDbContext _context;
     private readonly IEnrollmentService _enrollmentService;
+    private readonly IConfiguration? _configuration;
 
-    public PaymentService(AppDbContext context, IEnrollmentService enrollmentService)
+    public PaymentService(AppDbContext context, IEnrollmentService enrollmentService, IConfiguration? configuration = null)
     {
         _context = context;
         _enrollmentService = enrollmentService;
-    }
-
-    public async Task<PaymentDto> ProcessInstantCheckoutAsync(Guid studentId, InstantCheckoutDto dto)
-    {
-        var student = await _context.Users.FindAsync(studentId);
-        if (student == null) throw new KeyNotFoundException("Student not found.");
-
-        var course = await _context.Courses.FindAsync(dto.CourseId);
-        if (course == null) throw new KeyNotFoundException("Course not found.");
-
-        var transactionRef = $"TXN-INST-{DateTime.UtcNow:yyyyMMddHHmmss}-{new Random().Next(1000, 9999)}";
-
-        var payment = new Payment
-        {
-            StudentId = studentId,
-            CourseId = dto.CourseId,
-            Amount = course.Price,
-            Currency = "USD",
-            Method = PaymentMethod.InstantGateway,
-            Status = PaymentStatus.Completed,
-            TransactionRef = transactionRef,
-            VerifiedAt = DateTime.UtcNow,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        _context.Payments.Add(payment);
-        await _context.SaveChangesAsync();
-
-        // Auto-enroll the student for course.AccessDurationDays
-        await _enrollmentService.EnrollStudentAsync(studentId, dto.CourseId, course.AccessDurationDays);
-
-        // Generate Invoice
-        var invoice = await CreateInvoiceForPaymentAsync(payment, student, course);
-
-        return MapToDto(payment, student, course, invoice);
+        _configuration = configuration;
     }
 
     public async Task<PaymentDto> SubmitBankTransferAsync(Guid studentId, BankTransferSubmitDto dto)
@@ -224,7 +193,18 @@ public class PaymentService : IPaymentService
 
     public BankDetailsDto GetBankDetails()
     {
-        return new BankDetailsDto();
+        if (_configuration == null) return new BankDetailsDto();
+
+        var section = _configuration.GetSection("BankDetails");
+        return new BankDetailsDto
+        {
+            BankName = section["BankName"] ?? _configuration["BANK_NAME"] ?? string.Empty,
+            AccountHolder = section["AccountHolder"] ?? _configuration["BANK_ACCOUNT_HOLDER"] ?? string.Empty,
+            AccountNumber = section["AccountNumber"] ?? _configuration["BANK_ACCOUNT_NUMBER"] ?? string.Empty,
+            RoutingOrSwift = section["RoutingOrSwift"] ?? _configuration["BANK_ROUTING_OR_SWIFT"] ?? string.Empty,
+            BranchName = section["BranchName"] ?? _configuration["BANK_BRANCH_NAME"] ?? string.Empty,
+            TransferInstructions = section["TransferInstructions"] ?? _configuration["BANK_INSTRUCTIONS"] ?? string.Empty
+        };
     }
 
     private async Task<Invoice> CreateInvoiceForPaymentAsync(Payment payment, User student, Course course)
