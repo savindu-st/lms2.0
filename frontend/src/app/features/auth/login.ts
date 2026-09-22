@@ -12,18 +12,18 @@ import { AuthService } from '../../core/services/auth.service';
     <div class="auth-page">
       <div class="card auth-card">
         <div class="auth-header">
-          <span class="badge badge-indigo">Secure Portal Login</span>
-          <h2>Welcome Back</h2>
-          <p class="text-secondary">Sign in to your student classroom or instructor dashboard.</p>
+          <h2>Sign in to your account</h2>
+          <p class="text-secondary">Enter your email and password to access your courses and dashboard.</p>
         </div>
 
         @if (errorMessage()) {
           <div class="error-banner">
-            {{ errorMessage() }}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="error-icon"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <span>{{ errorMessage() }}</span>
           </div>
         }
 
-        <form (ngSubmit)="login()">
+        <form (ngSubmit)="login()" class="auth-form">
           <div class="form-group">
             <label class="form-label">Email Address</label>
             <input
@@ -31,7 +31,8 @@ import { AuthService } from '../../core/services/auth.service';
               class="form-control"
               [(ngModel)]="email"
               name="email"
-              placeholder="e.g. student@example.com"
+              placeholder="name@example.com"
+              autocomplete="email"
               required />
           </div>
 
@@ -43,6 +44,7 @@ import { AuthService } from '../../core/services/auth.service';
               [(ngModel)]="password"
               name="password"
               placeholder="••••••••"
+              autocomplete="current-password"
               required />
           </div>
 
@@ -52,15 +54,15 @@ import { AuthService } from '../../core/services/auth.service';
         </form>
 
         <div class="auth-footer">
-          <span>Don't have an account?</span>
-          <a routerLink="/register">Register here</a>
+          <span>Don't have an account yet?</span>
+          <a routerLink="/register" class="auth-link">Create an account</a>
         </div>
       </div>
     </div>
   `,
   styles: [`
     .auth-page {
-      min-height: calc(100vh - 72px);
+      min-height: calc(100vh - 64px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -68,43 +70,75 @@ import { AuthService } from '../../core/services/auth.service';
     }
 
     .auth-card {
-      max-width: 460px;
+      max-width: 420px;
       width: 100%;
-      padding: 2.5rem;
+      padding: 2.25rem;
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
     }
 
     .auth-header {
       text-align: center;
-      margin-bottom: 2rem;
+      margin-bottom: 1.75rem;
     }
 
     .auth-header h2 {
-      margin: 0.5rem 0 0.25rem;
+      font-size: 1.375rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      margin-bottom: 0.35rem;
+    }
+
+    .auth-header p {
+      font-size: 0.8125rem;
     }
 
     .error-banner {
-      background: #fee2e2;
-      border: 1px solid #fecaca;
-      color: #b91c1c;
-      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--rose-light);
+      border: 1px solid var(--rose-border);
+      color: var(--rose);
+      padding: 0.65rem 0.85rem;
       border-radius: var(--radius-md);
-      font-size: 0.85rem;
-      margin-bottom: 1.5rem;
+      font-size: 0.8125rem;
+      margin-bottom: 1.25rem;
       font-weight: 500;
     }
 
-    .w-full {
-      width: 100%;
+    .error-icon {
+      flex-shrink: 0;
+    }
+
+    .auth-form {
+      display: flex;
+      flex-direction: column;
     }
 
     .auth-footer {
       text-align: center;
-      margin-top: 2rem;
-      font-size: 0.875rem;
+      margin-top: 1.75rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 0.8125rem;
       color: var(--text-secondary);
       display: flex;
       justify-content: center;
       gap: 0.35rem;
+    }
+
+    .auth-link {
+      color: var(--text-primary);
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .auth-link:hover {
+      color: var(--primary-hover);
     }
   `]
 })

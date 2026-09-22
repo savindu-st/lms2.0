@@ -17,12 +17,12 @@ import { PaymentService } from '../../../core/services/payment.service';
       <aside class="curriculum-sidebar">
         <div class="sidebar-header">
           <a routerLink="/student/my-courses" class="back-link">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
             My Classroom
           </a>
           <h3 class="sidebar-course-title">{{ course()?.title }}</h3>
           <div class="validity-indicator mono-num" *ngIf="course()?.daysRemaining !== null">
-            <span class="pulse-dot"></span>
+            <span class="status-dot"></span>
             {{ course()?.daysRemaining }} Days Access Left
           </div>
         </div>
@@ -44,7 +44,7 @@ import { PaymentService } from '../../../core/services/payment.service';
                     [class.completed]="les.isCompleted">
                     <div class="lesson-btn-left">
                       <span class="status-circle" [class.is-done]="les.isCompleted">
-                        <svg *ngIf="les.isCompleted" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <svg *ngIf="les.isCompleted" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
                       </span>
                       <span class="lesson-label">{{ les.title }}</span>
                     </div>
@@ -52,7 +52,7 @@ import { PaymentService } from '../../../core/services/payment.service';
                     <div class="lesson-btn-right">
                       <span class="type-badge" [ngSwitch]="les.contentType">
                         <span *ngSwitchCase="1">Video</span>
-                        <span *ngSwitchCase="2">Reading</span>
+                        <span *ngSwitchCase="2">Read</span>
                         <span *ngSwitchCase="3">Quiz</span>
                         <span *ngSwitchCase="4">Task</span>
                       </span>
@@ -74,13 +74,14 @@ import { PaymentService } from '../../../core/services/payment.service';
           </div>
         } @else if (!activeLesson()) {
           <div class="stage-empty card">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="empty-icon"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
             <h3>Select a lesson from the curriculum menu to begin</h3>
           </div>
         } @else {
           <!-- Lesson Stage Header -->
           <div class="stage-top-bar">
             <div>
-              <span class="badge badge-indigo" [ngSwitch]="activeLesson()?.contentType">
+              <span class="badge badge-zinc" [ngSwitch]="activeLesson()?.contentType" style="margin-bottom: 0.5rem;">
                 <span *ngSwitchCase="1">Video Lecture</span>
                 <span *ngSwitchCase="2">Reading & Notes</span>
                 <span *ngSwitchCase="3">Assessment Quiz</span>
@@ -91,10 +92,10 @@ import { PaymentService } from '../../../core/services/payment.service';
 
             <button
               (click)="toggleLessonCompletion()"
-              class="btn"
+              class="btn btn-sm"
               [class.btn-emerald]="activeLesson()?.isCompleted"
               [class.btn-outline]="!activeLesson()?.isCompleted">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
               <span>{{ activeLesson()?.isCompleted ? 'Completed' : 'Mark as Complete' }}</span>
             </button>
           </div>
@@ -129,10 +130,10 @@ import { PaymentService } from '../../../core/services/payment.service';
           @if (activeLesson()?.attachmentUrl) {
             <div class="attachment-card card">
               <div class="att-info">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-cyan"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
                 <div>
                   <h4>{{ activeLesson()?.attachmentFileName || 'Accounting Study Material / Excel Sheet' }}</h4>
-                  <span class="text-muted">Instructor Downloadable Resource</span>
+                  <span class="text-muted" style="font-size: 0.75rem;">Downloadable Course Companion Resource</span>
                 </div>
               </div>
               <a [href]="activeLesson()?.attachmentUrl" target="_blank" download class="btn btn-outline btn-sm">
@@ -147,7 +148,7 @@ import { PaymentService } from '../../../core/services/payment.service';
             <div class="quiz-container card">
               <div class="quiz-header">
                 <h3>Accounting Assessment Quiz</h3>
-                <p class="text-secondary">Answer all multiple-choice questions. Score 60% or higher to automatically pass and complete this lesson.</p>
+                <p class="text-secondary">Answer all questions accurately. Score 60% or higher to automatically pass and complete this lesson module.</p>
               </div>
 
               <!-- Questions List -->
@@ -155,7 +156,7 @@ import { PaymentService } from '../../../core/services/payment.service';
                 <form (ngSubmit)="submitQuiz()" class="quiz-form">
                   @for (q of activeLesson()?.quizQuestions; track q.id; let idx = $index) {
                     <div class="quiz-question-card">
-                      <div class="q-number">Question {{ idx + 1 }} ({{ q.points }} Points)</div>
+                      <div class="q-number">Question {{ idx + 1 }} &bull; {{ q.points }} Points</div>
                       <p class="q-text">{{ q.questionText }}</p>
 
                       <div class="q-options">
@@ -188,7 +189,7 @@ import { PaymentService } from '../../../core/services/payment.service';
                 <div class="quiz-result-box" [class.passed]="quizResult()?.passed">
                   <div class="score-circle">
                     <span class="score-num mono-num">{{ quizResult()?.percentage }}%</span>
-                    <span class="score-status">{{ quizResult()?.passed ? 'PASSED' : 'TRY AGAIN' }}</span>
+                    <span class="score-status">{{ quizResult()?.passed ? 'PASSED' : 'RETRY' }}</span>
                   </div>
                   <h4>You scored {{ quizResult()?.score }} out of {{ quizResult()?.totalPoints }} points</h4>
 
@@ -206,7 +207,7 @@ import { PaymentService } from '../../../core/services/payment.service';
                     }
                   </div>
 
-                  <button (click)="retakeQuiz()" class="btn btn-secondary">
+                  <button (click)="retakeQuiz()" class="btn btn-outline btn-sm">
                     Retake Quiz
                   </button>
                 </div>
@@ -219,24 +220,25 @@ import { PaymentService } from '../../../core/services/payment.service';
             <div class="assignment-container card">
               <div class="assignment-header">
                 <div>
-                  <span class="badge badge-amber">Homework Assignment</span>
+                  <div class="badge badge-amber" style="margin-bottom: 0.35rem;">Practical Homework Task</div>
                   <h3>{{ activeLesson()?.assignment?.title }}</h3>
                 </div>
                 <div class="max-points-pill mono-num">
-                  Max Points: {{ activeLesson()?.assignment?.maxPoints }}
+                  Max: {{ activeLesson()?.assignment?.maxPoints }} Pts
                 </div>
               </div>
 
               <div class="instructions-box">
-                <h4>Instructions</h4>
+                <h4>Assignment Brief</h4>
                 <p>{{ activeLesson()?.assignment?.instructions }}</p>
               </div>
 
               <!-- Template download -->
               <div class="template-box" *ngIf="activeLesson()?.assignment?.templateFileUrl">
-                <span>Starter Workbook Template:</span>
+                <span class="text-secondary font-medium">Starter Workbook Template:</span>
                 <a [href]="activeLesson()?.assignment?.templateFileUrl" target="_blank" download class="btn btn-outline btn-sm">
-                  Download Template
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  Download Workbook
                 </a>
               </div>
 
@@ -245,19 +247,19 @@ import { PaymentService } from '../../../core/services/payment.service';
                 <div class="submission-status-card">
                   <div class="sub-status-header">
                     <h4>Your Submission</h4>
-                    <span class="badge" [class.badge-emerald]="activeLesson()?.assignment?.mySubmission?.status === 2" [class.badge-indigo]="activeLesson()?.assignment?.mySubmission?.status === 1">
+                    <span class="badge" [class.badge-emerald]="activeLesson()?.assignment?.mySubmission?.status === 2" [class.badge-zinc]="activeLesson()?.assignment?.mySubmission?.status === 1">
                       {{ activeLesson()?.assignment?.mySubmission?.status === 2 ? 'Graded' : 'Under Teacher Review' }}
                     </span>
                   </div>
 
                   <div class="sub-details">
-                    <p>Submitted File: <a [href]="activeLesson()?.assignment?.mySubmission?.submittedFileUrl" target="_blank">{{ activeLesson()?.assignment?.mySubmission?.originalFileName }}</a></p>
-                    <p class="text-muted">Submitted on {{ activeLesson()?.assignment?.mySubmission?.submittedAt | date:'medium' }}</p>
+                    <p class="font-medium">File: <a [href]="activeLesson()?.assignment?.mySubmission?.submittedFileUrl" target="_blank" class="sub-file-link">{{ activeLesson()?.assignment?.mySubmission?.originalFileName }}</a></p>
+                    <p class="text-muted" style="font-size: 0.75rem; margin-top: 0.25rem;">Uploaded on {{ activeLesson()?.assignment?.mySubmission?.submittedAt | date:'medium' }}</p>
 
                     @if (activeLesson()?.assignment?.mySubmission?.status === 2) {
                       <div class="graded-box">
                         <div class="grade-score mono-num">
-                          Score: {{ activeLesson()?.assignment?.mySubmission?.score }} / {{ activeLesson()?.assignment?.mySubmission?.maxPoints }}
+                          Score: {{ activeLesson()?.assignment?.mySubmission?.score }} / {{ activeLesson()?.assignment?.mySubmission?.maxPoints }} Points
                         </div>
                         <p *ngIf="activeLesson()?.assignment?.mySubmission?.teacherFeedback" class="grade-feedback">
                           <strong>Instructor Feedback:</strong> {{ activeLesson()?.assignment?.mySubmission?.teacherFeedback }}
@@ -269,16 +271,16 @@ import { PaymentService } from '../../../core/services/payment.service';
               } @else {
                 <!-- Upload form -->
                 <form (ngSubmit)="submitAssignment()" class="assignment-submit-form">
-                  <h4>Submit Solution File (Excel / PDF)</h4>
-                  <div class="form-group">
-                    <input type="file" (change)="onAssignmentFileSelected($event)" accept=".xlsx,.xls,.pdf,.csv" class="form-control" />
+                  <h4>Upload Your Solution File (Excel / PDF / CSV)</h4>
+                  <div class="form-group" style="margin-top: 0.75rem;">
+                    <input type="file" (change)="onAssignmentFileSelected($event)" accept=".xlsx,.xls,.pdf,.csv" class="form-control file-input" />
                   </div>
                   <div class="form-group">
                     <label class="form-label">Notes for Instructor (optional)</label>
-                    <textarea [(ngModel)]="assignmentNotes" name="asNotes" class="form-control" rows="2" placeholder="Describe key formulas or assumptions used..."></textarea>
+                    <textarea [(ngModel)]="assignmentNotes" name="asNotes" class="form-control" rows="2" placeholder="Detail any assumptions, model formulas, or footnotes..."></textarea>
                   </div>
                   <button type="submit" [disabled]="submittingAssignment() || !assignmentFile" class="btn btn-emerald btn-lg">
-                    {{ submittingAssignment() ? 'Uploading Submission...' : 'Submit Assignment to Teacher' }}
+                    {{ submittingAssignment() ? 'Uploading Submission...' : 'Submit Solution to Instructor' }}
                   </button>
                 </form>
               }
@@ -291,8 +293,9 @@ import { PaymentService } from '../../../core/services/payment.service';
   styles: [`
     .classroom-layout {
       display: grid;
-      grid-template-columns: 340px 1fr;
-      min-height: calc(100vh - 72px);
+      grid-template-columns: 320px 1fr;
+      min-height: calc(100vh - 64px);
+      background: var(--bg-main);
     }
 
     @media (max-width: 900px) {
@@ -306,30 +309,35 @@ import { PaymentService } from '../../../core/services/payment.service';
       border-right: 1px solid var(--border-subtle);
       display: flex;
       flex-direction: column;
-      height: calc(100vh - 72px);
+      height: calc(100vh - 64px);
       position: sticky;
-      top: 72px;
+      top: 64px;
       overflow-y: auto;
     }
 
     .sidebar-header {
       padding: 1.25rem;
       border-bottom: 1px solid var(--border-subtle);
-      background: #f8fafc;
+      background: var(--bg-card);
     }
 
     .back-link {
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--text-secondary);
       margin-bottom: 0.5rem;
-      font-weight: 600;
+      font-weight: 500;
+    }
+
+    .back-link:hover {
+      color: var(--text-primary);
     }
 
     .sidebar-course-title {
-      font-size: 1.05rem;
+      font-size: 0.9375rem;
+      font-weight: 700;
       margin-bottom: 0.5rem;
       line-height: 1.35;
       color: var(--text-primary);
@@ -338,46 +346,48 @@ import { PaymentService } from '../../../core/services/payment.service';
     .validity-indicator {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: #065f46;
-      background: #ecfdf5;
-      padding: 0.2rem 0.6rem;
+      gap: 0.35rem;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--emerald);
+      background: var(--emerald-light);
+      padding: 0.15rem 0.5rem;
       border-radius: var(--radius-full);
-      border: 1px solid #a7f3d0;
+      border: 1px solid var(--emerald-border);
     }
 
-    .pulse-dot {
-      width: 6px;
-      height: 6px;
-      background: #059669;
+    .status-dot {
+      width: 5px;
+      height: 5px;
       border-radius: 50%;
+      background: currentColor;
     }
 
     .modules-accordion {
-      padding: 0.75rem 0;
+      padding: 0.5rem 0;
     }
 
     .module-group {
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
     }
 
     .module-group-title {
-      padding: 0.5rem 1.25rem;
+      padding: 0.4rem 1rem;
     }
 
     .mod-num {
-      font-size: 0.7rem;
+      font-size: 0.6875rem;
       font-weight: 700;
-      color: #4f46e5;
+      color: var(--text-muted);
       text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
 
     .module-group-title h4 {
-      font-size: 0.875rem;
-      color: var(--text-secondary);
+      font-size: 0.8125rem;
+      color: var(--text-primary);
       font-weight: 600;
+      line-height: 1.3;
     }
 
     .lesson-item-btn {
@@ -386,40 +396,41 @@ import { PaymentService } from '../../../core/services/payment.service';
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.75rem 1.25rem;
+      padding: 0.6rem 1rem;
       background: transparent;
       border: none;
-      border-left: 3px solid transparent;
+      border-left: 2px solid transparent;
       color: var(--text-secondary);
       cursor: pointer;
       transition: var(--transition);
-      font-size: 0.875rem;
+      font-size: 0.8125rem;
+      font-family: var(--font-sans);
     }
 
     .lesson-item-btn:hover {
-      background: #f8fafc;
+      background: var(--bg-subtle);
       color: var(--text-primary);
     }
 
     .lesson-item-btn.active-lesson {
-      background: #eef2ff;
-      border-left-color: #4f46e5;
-      color: #4f46e5;
-      font-weight: 700;
+      background: var(--bg-subtle);
+      border-left-color: var(--primary);
+      color: var(--text-primary);
+      font-weight: 600;
     }
 
     .lesson-btn-left {
       display: flex;
       align-items: center;
-      gap: 0.65rem;
-      max-width: 220px;
+      gap: 0.5rem;
+      max-width: 200px;
     }
 
     .status-circle {
-      width: 18px;
-      height: 18px;
+      width: 16px;
+      height: 16px;
       border-radius: 50%;
-      border: 1px solid #cbd5e1;
+      border: 1px solid var(--border-hover);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -428,8 +439,8 @@ import { PaymentService } from '../../../core/services/payment.service';
     }
 
     .status-circle.is-done {
-      background: #059669;
-      border-color: #059669;
+      background: var(--emerald);
+      border-color: var(--emerald);
       color: #ffffff;
     }
 
@@ -440,32 +451,33 @@ import { PaymentService } from '../../../core/services/payment.service';
     }
 
     .type-badge {
-      font-size: 0.65rem;
-      font-weight: 700;
+      font-size: 0.625rem;
+      font-weight: 600;
       text-transform: uppercase;
-      background: #f1f5f9;
-      padding: 0.15rem 0.4rem;
-      border-radius: 3px;
+      background: var(--bg-subtle);
+      padding: 0.15rem 0.35rem;
+      border-radius: var(--radius-xs);
       color: var(--text-muted);
       border: 1px solid var(--border-subtle);
     }
 
     .player-stage {
-      padding: 2.5rem 3rem 5rem;
-      max-width: 1000px;
+      padding: 2.25rem 2.5rem 5rem;
+      max-width: 920px;
     }
 
     .stage-top-bar {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 2rem;
+      margin-bottom: 1.75rem;
       gap: 1rem;
     }
 
     .stage-lesson-title {
-      margin-top: 0.4rem;
-      font-size: 1.85rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
       color: var(--text-primary);
     }
 
@@ -474,13 +486,13 @@ import { PaymentService } from '../../../core/services/payment.service';
       padding-bottom: 56.25%;
       height: 0;
       overflow: hidden;
-      margin-bottom: 2rem;
+      margin-bottom: 1.75rem;
       border-radius: var(--radius-lg);
-      background: #000000;
+      background: #09090b;
       padding-top: 0;
       padding-left: 0;
       padding-right: 0;
-      box-shadow: var(--shadow-md);
+      box-shadow: var(--shadow-sm);
     }
 
     .video-iframe {
@@ -493,94 +505,103 @@ import { PaymentService } from '../../../core/services/payment.service';
     }
 
     .lesson-content-card, .attachment-card, .quiz-container, .assignment-container {
-      margin-bottom: 2rem;
+      margin-bottom: 1.75rem;
       background: #ffffff;
     }
 
     .notes-heading {
-      margin-bottom: 0.75rem;
-      color: #4f46e5;
+      font-size: 0.9375rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
     }
 
     .notes-body {
-      font-size: 1rem;
-      line-height: 1.7;
+      font-size: 0.9375rem;
+      line-height: 1.65;
       color: var(--text-secondary);
+      white-space: pre-line;
     }
 
     .attachment-card {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: #f0f9ff;
-      border-color: #bae6fd;
+      background: #ffffff;
+      border-color: var(--border-subtle);
     }
 
     .att-info {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 0.75rem;
+    }
+
+    .att-info h4 {
+      font-size: 0.875rem;
+      font-weight: 600;
     }
 
     .quiz-question-card {
-      background: #f8fafc;
+      background: var(--bg-subtle);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-md);
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
     }
 
     .q-number {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: #4f46e5;
-      margin-bottom: 0.4rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
       text-transform: uppercase;
     }
 
     .q-text {
-      font-size: 1.05rem;
+      font-size: 0.9375rem;
       font-weight: 600;
-      margin-bottom: 1rem;
+      margin-bottom: 0.85rem;
       color: var(--text-primary);
     }
 
     .q-options {
       display: flex;
       flex-direction: column;
-      gap: 0.65rem;
+      gap: 0.5rem;
     }
 
     .option-label {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      padding: 0.75rem 1rem;
+      gap: 0.65rem;
+      padding: 0.6rem 0.85rem;
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-sm);
       cursor: pointer;
       transition: var(--transition);
       background: #ffffff;
       color: var(--text-primary);
+      font-size: 0.8125rem;
     }
 
     .option-label:hover, .option-label.selected {
-      border-color: #4f46e5;
-      background: #eef2ff;
+      border-color: var(--border-focus);
+      background: var(--bg-subtle);
     }
 
     .quiz-result-box {
       text-align: center;
-      padding: 2rem 0;
+      padding: 1.5rem 0;
     }
 
     .score-circle {
-      width: 100px;
-      height: 100px;
+      width: 88px;
+      height: 88px;
       border-radius: 50%;
-      background: #ecfdf5;
-      border: 3px solid #10b981;
-      margin: 0 auto 1.25rem;
+      background: var(--emerald-light);
+      border: 2px solid var(--emerald-border);
+      margin: 0 auto 1rem;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -588,141 +609,157 @@ import { PaymentService } from '../../../core/services/payment.service';
     }
 
     .score-num {
-      font-size: 1.75rem;
+      font-size: 1.5rem;
       font-weight: 800;
-      color: #059669;
+      color: var(--emerald);
     }
 
     .score-status {
-      font-size: 0.65rem;
-      font-weight: 800;
-      color: #059669;
+      font-size: 0.625rem;
+      font-weight: 700;
+      color: var(--emerald);
       letter-spacing: 0.05em;
     }
 
     .reviews-list {
-      margin: 2rem 0;
+      margin: 1.5rem 0;
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 0.75rem;
       text-align: left;
     }
 
     .review-item {
-      padding: 1rem;
+      padding: 0.85rem 1rem;
       border-radius: var(--radius-md);
       border: 1px solid var(--border-subtle);
     }
 
     .review-correct {
-      background: #ecfdf5;
-      border-color: #a7f3d0;
+      background: var(--emerald-light);
+      border-color: var(--emerald-border);
       color: #065f46;
     }
 
     .review-wrong {
-      background: #fff1f2;
-      border-color: #fecdd3;
+      background: var(--rose-light);
+      border-color: var(--rose-border);
       color: #9f1239;
     }
 
     .review-status {
-      font-size: 0.75rem;
+      font-size: 0.6875rem;
       font-weight: 700;
-      margin-bottom: 0.3rem;
+      margin-bottom: 0.25rem;
       text-transform: uppercase;
     }
 
+    .review-question {
+      font-size: 0.8125rem;
+      font-weight: 600;
+    }
+
     .review-explanation {
-      margin-top: 0.5rem;
-      font-size: 0.85rem;
-      color: var(--text-secondary);
+      margin-top: 0.4rem;
+      font-size: 0.75rem;
       border-top: 1px solid rgba(0, 0, 0, 0.06);
-      padding-top: 0.5rem;
+      padding-top: 0.4rem;
     }
 
     .assignment-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
     }
 
     .max-points-pill {
-      background: #fffbeb;
-      border: 1px solid #fde68a;
-      color: #92400e;
-      font-weight: 700;
-      padding: 0.35rem 0.75rem;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.6rem;
       border-radius: var(--radius-sm);
     }
 
     .instructions-box {
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
     }
 
     .instructions-box h4 {
-      margin-bottom: 0.5rem;
-      color: var(--text-secondary);
+      font-size: 0.8125rem;
+      margin-bottom: 0.35rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .instructions-box p {
+      font-size: 0.875rem;
+      line-height: 1.6;
     }
 
     .template-box {
       display: flex;
       align-items: center;
-      gap: 1rem;
-      background: #f8fafc;
-      padding: 0.85rem 1.25rem;
+      gap: 0.75rem;
+      background: var(--bg-subtle);
+      padding: 0.75rem 1rem;
       border-radius: var(--radius-md);
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
       border: 1px solid var(--border-subtle);
+      font-size: 0.8125rem;
     }
 
     .submission-status-card {
-      background: #f8fafc;
+      background: var(--bg-subtle);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-md);
-      padding: 1.5rem;
+      padding: 1.25rem;
     }
 
     .sub-status-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .sub-file-link {
+      color: var(--text-primary);
+      text-decoration: underline;
+      font-weight: 600;
     }
 
     .graded-box {
-      margin-top: 1.25rem;
-      padding: 1rem;
-      background: #ecfdf5;
-      border: 1px solid #a7f3d0;
+      margin-top: 1rem;
+      padding: 0.85rem 1rem;
+      background: var(--emerald-light);
+      border: 1px solid var(--emerald-border);
       border-radius: var(--radius-md);
     }
 
     .grade-score {
-      font-size: 1.15rem;
-      font-weight: 800;
-      color: #059669;
-      margin-bottom: 0.4rem;
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: var(--emerald);
+      margin-bottom: 0.25rem;
     }
 
     .grade-feedback {
-      font-size: 0.9rem;
+      font-size: 0.8125rem;
       color: var(--text-primary);
     }
 
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid #e2e8f0;
-      border-top-color: #4f46e5;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 1rem;
+    .assignment-submit-form h4 {
+      font-size: 0.875rem;
+      font-weight: 600;
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    .file-input {
+      padding: 0.45rem;
+      font-size: 0.8125rem;
     }
   `]
 })
@@ -750,7 +787,6 @@ export class ClassroomPlayerComponent {
     const rawUrl = this.activeLesson()?.videoUrl;
     if (!rawUrl) return null;
 
-    // Convert youtube watch to embed
     let embedUrl = rawUrl;
     if (rawUrl.includes('youtube.com/watch?v=')) {
       const vidId = rawUrl.split('watch?v=')[1]?.split('&')[0];
@@ -779,7 +815,6 @@ export class ClassroomPlayerComponent {
         this.course.set(detail);
         this.loading.set(false);
 
-        // Select first lesson by default
         const firstMod = detail.modules?.[0];
         const firstLes = firstMod?.lessons?.[0];
         if (firstLes) {
@@ -854,10 +889,8 @@ export class ClassroomPlayerComponent {
     if (!les?.assignment || !this.assignmentFile) return;
 
     this.submittingAssignment.set(true);
-    // 1. Upload file
     this.paymentService.uploadFile(this.assignmentFile, 'submissions').subscribe({
       next: (uploadRes) => {
-        // 2. Submit assignment
         this.courseService.submitAssignment(les.assignment!.id, {
           fileUrl: uploadRes.fileUrl,
           originalFileName: uploadRes.originalName,

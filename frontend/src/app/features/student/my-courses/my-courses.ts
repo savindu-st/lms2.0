@@ -14,14 +14,13 @@ import { AuthService } from '../../../core/services/auth.service';
     <div class="container student-dashboard">
       <div class="dash-header">
         <div>
-          <span class="badge badge-emerald">Student Dashboard</span>
           <h1>My Classroom</h1>
-          <p class="text-secondary">Track your enrolled courses, time-limited access validity, and pending approvals.</p>
+          <p class="text-secondary">Track your active enrolled courses, time-limited access periods, and curriculum progress.</p>
         </div>
 
-        <a routerLink="/" class="btn btn-outline">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-          Browse More Courses
+        <a routerLink="/" class="btn btn-outline btn-sm">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Browse Masterclasses
         </a>
       </div>
 
@@ -29,18 +28,18 @@ import { AuthService } from '../../../core/services/auth.service';
       @if (pendingPayments().length > 0) {
         <div class="pending-alert card">
           <div class="alert-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-amber"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
           </div>
           <div class="alert-content">
             <h4>Bank Transfer Verification in Progress</h4>
             <p class="text-secondary">
-              You have submitted {{ pendingPayments().length }} transfer slip(s). The academy instructor reviews and approves payments regularly.
+              You have submitted {{ pendingPayments().length }} transfer receipt(s). The instructor reviews and approves incoming wire payments regularly.
             </p>
             <div class="pending-slips-list">
               @for (pay of pendingPayments(); track pay.id) {
                 <div class="pending-slip-pill">
-                  <strong>{{ pay.courseTitle }}</strong>
-                  <span class="mono-num">Ref: {{ pay.transactionRef }}</span>
+                  <span class="font-medium">{{ pay.courseTitle }}</span>
+                  <span class="mono-num text-muted">Ref: {{ pay.transactionRef }}</span>
                   <span class="badge badge-amber">Awaiting Approval</span>
                 </div>
               }
@@ -53,23 +52,23 @@ import { AuthService } from '../../../core/services/auth.service';
       @if (loading()) {
         <div class="loading-state">
           <div class="spinner"></div>
-          <p>Loading your enrolled courses...</p>
+          <p>Loading your enrolled masterclasses...</p>
         </div>
       } @else if (enrollments().length === 0 && pendingPayments().length === 0) {
         <div class="empty-state card">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="empty-icon"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="empty-icon"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
           <h3>You are not enrolled in any classes yet</h3>
-          <p class="text-secondary">Explore this month's accounting masterclasses to begin your learning journey.</p>
-          <a routerLink="/" class="btn btn-primary btn-lg">Explore Course Catalog</a>
+          <p class="text-secondary">Explore current accounting and finance masterclasses to begin your learning curriculum.</p>
+          <a routerLink="/" class="btn btn-primary btn-sm" style="margin-top: 0.5rem;">Explore Course Catalog</a>
         </div>
       } @else {
         <div class="enrollments-grid">
           @for (enroll of enrollments(); track enroll.id) {
             <div class="card card-hover enrollment-card" [class.is-expired]="enroll.isExpired">
               <div class="card-header-bar">
-                <div class="badge badge-indigo">{{ enroll.monthYear }}</div>
+                <div class="badge badge-zinc">{{ enroll.monthYear }} Cohort</div>
                 <div
-                  class="days-badge mono-num"
+                  class="badge mono-num"
                   [class.badge-emerald]="enroll.daysRemaining > 15 && !enroll.isExpired"
                   [class.badge-amber]="enroll.daysRemaining <= 15 && !enroll.isExpired"
                   [class.badge-rose]="enroll.isExpired">
@@ -81,14 +80,16 @@ import { AuthService } from '../../../core/services/auth.service';
                 </div>
               </div>
 
-              <h3 class="course-title">{{ enroll.courseTitle }}</h3>
-              <span class="course-code mono-num">{{ enroll.courseCode }}</span>
+              <div class="course-info">
+                <h3 class="course-title">{{ enroll.courseTitle }}</h3>
+                <span class="course-code mono-num">{{ enroll.courseCode }}</span>
+              </div>
 
               <!-- Progress bar -->
               <div class="progress-section">
                 <div class="progress-labels">
                   <span>Curriculum Progress</span>
-                  <span class="mono-num">{{ enroll.progressPercentage }}%</span>
+                  <span class="mono-num font-medium">{{ enroll.progressPercentage }}%</span>
                 </div>
                 <div class="progress-bar-bg">
                   <div class="progress-bar-fill" [style.width.%]="enroll.progressPercentage"></div>
@@ -97,18 +98,17 @@ import { AuthService } from '../../../core/services/auth.service';
 
               <div class="card-footer-action">
                 <div class="validity-info">
-                  <span class="label">Access Valid Until:</span>
+                  <span class="label">Access Valid Until</span>
                   <span class="val mono-num">{{ enroll.expiresAt | date:'mediumDate' }}</span>
                 </div>
 
                 @if (!enroll.isExpired) {
-                  <a [routerLink]="['/student/learn', enroll.courseId]" class="btn btn-emerald">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                    Resume Learning
+                  <a [routerLink]="['/student/learn', enroll.courseId]" class="btn btn-emerald btn-sm">
+                    Resume &rarr;
                   </a>
                 } @else {
-                  <button class="btn btn-outline" disabled>
-                    Expired &bull; Contact Teacher
+                  <button class="btn btn-outline btn-sm" disabled>
+                    Expired
                   </button>
                 }
               </div>
@@ -120,14 +120,14 @@ import { AuthService } from '../../../core/services/auth.service';
   `,
   styles: [`
     .student-dashboard {
-      padding: 3rem 1.5rem 5rem;
+      padding: 2.5rem 1.5rem 5rem;
     }
 
     .dash-header {
       display: flex;
       flex-direction: column;
       gap: 1rem;
-      margin-bottom: 2.5rem;
+      margin-bottom: 2rem;
     }
 
     @media (min-width: 768px) {
@@ -140,19 +140,35 @@ import { AuthService } from '../../../core/services/auth.service';
 
     .pending-alert {
       display: flex;
-      gap: 1.25rem;
-      background: #fffbeb;
-      border: 1px solid #fde68a;
-      margin-bottom: 2.5rem;
+      gap: 1rem;
+      background: var(--amber-light);
+      border: 1px solid var(--amber-border);
+      margin-bottom: 2rem;
       align-items: flex-start;
       border-radius: var(--radius-lg);
-      padding: 1.5rem;
+      padding: 1.25rem 1.5rem;
+    }
+
+    .alert-icon {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .alert-content h4 {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--amber-hover);
+      margin-bottom: 0.25rem;
+    }
+
+    .alert-content p {
+      font-size: 0.8125rem;
     }
 
     .pending-slips-list {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.75rem;
+      gap: 0.5rem;
       margin-top: 0.75rem;
     }
 
@@ -161,17 +177,17 @@ import { AuthService } from '../../../core/services/auth.service';
       align-items: center;
       gap: 0.5rem;
       background: #ffffff;
-      padding: 0.4rem 0.85rem;
+      padding: 0.3rem 0.65rem;
       border-radius: var(--radius-sm);
       border: 1px solid var(--border-subtle);
-      font-size: 0.85rem;
-      box-shadow: var(--shadow-sm);
+      font-size: 0.75rem;
+      box-shadow: var(--shadow-xs);
     }
 
     .enrollments-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-      gap: 1.75rem;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.5rem;
     }
 
     .enrollment-card {
@@ -182,59 +198,64 @@ import { AuthService } from '../../../core/services/auth.service';
     }
 
     .enrollment-card.is-expired {
-      opacity: 0.65;
-      border-color: #fecdd3;
+      opacity: 0.7;
+      border-color: var(--rose-border);
     }
 
     .card-header-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .course-info {
+      margin-bottom: 1.25rem;
     }
 
     .course-title {
-      font-size: 1.25rem;
+      font-size: 1.125rem;
+      font-weight: 700;
       margin-bottom: 0.25rem;
       color: var(--text-primary);
     }
 
     .course-code {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--text-muted);
-      margin-bottom: 1.5rem;
       display: block;
     }
 
     .progress-section {
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
     }
 
     .progress-labels {
       display: flex;
       justify-content: space-between;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--text-secondary);
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.35rem;
     }
 
     .progress-bar-bg {
-      height: 8px;
-      background: #e2e8f0;
+      height: 6px;
+      background: var(--bg-subtle);
       border-radius: var(--radius-full);
       overflow: hidden;
+      border: 1px solid var(--border-subtle);
     }
 
     .progress-bar-fill {
       height: 100%;
-      background: linear-gradient(90deg, #4f46e5 0%, #10b981 100%);
+      background: var(--emerald);
       border-radius: var(--radius-full);
-      transition: width 0.4s ease;
+      transition: width 0.3s ease;
     }
 
     .card-footer-action {
       border-top: 1px solid var(--border-subtle);
-      padding-top: 1.25rem;
+      padding-top: 1rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -243,7 +264,8 @@ import { AuthService } from '../../../core/services/auth.service';
     .validity-info {
       display: flex;
       flex-direction: column;
-      font-size: 0.775rem;
+      font-size: 0.75rem;
+      line-height: 1.3;
     }
 
     .validity-info .label {
@@ -253,40 +275,6 @@ import { AuthService } from '../../../core/services/auth.service';
     .validity-info .val {
       color: var(--text-primary);
       font-weight: 600;
-    }
-
-    .loading-state, .empty-state {
-      text-align: center;
-      padding: 4rem 1rem;
-      color: var(--text-secondary);
-    }
-
-    .empty-icon {
-      color: var(--text-muted);
-      margin-bottom: 1rem;
-    }
-
-    .empty-state h3 {
-      margin-bottom: 0.5rem;
-      color: var(--text-primary);
-    }
-
-    .empty-state p {
-      margin-bottom: 1.5rem;
-    }
-
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid #e2e8f0;
-      border-top-color: #4f46e5;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 1rem;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
     }
   `]
 })
@@ -314,7 +302,6 @@ export class MyCoursesComponent {
       error: () => this.loading.set(false)
     });
 
-    // Also check student's payments for any pending bank transfers
     this.paymentService.getMyInvoices().subscribe({
       next: () => {
         // Pending payments check can be extended

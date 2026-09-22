@@ -12,15 +12,14 @@ import { TeacherService } from '../../../core/services/teacher.service';
     <div class="container verification-page">
       <div class="page-header">
         <div>
-          <span class="badge badge-amber">Accounting Compliance</span>
           <h1>Bank Transfer Verification Desk</h1>
-          <p class="text-secondary">Verify incoming bank deposits and wire transfers. Approving activates student classroom access immediately and issues a formal tax invoice.</p>
+          <p class="text-secondary">Verify incoming wire deposits and bank slips. Approving activates immediate student classroom access and generates a tax invoice.</p>
         </div>
       </div>
 
-      <!-- Pending Queue -->
+      <!-- Pending Queue Header -->
       <div class="section-title-bar">
-        <h3>Pending Verification Queue ({{ pendingPayments().length }})</h3>
+        <h3>Pending Verifications ({{ pendingPayments().length }})</h3>
       </div>
 
       @if (loading()) {
@@ -30,9 +29,9 @@ import { TeacherService } from '../../../core/services/teacher.service';
         </div>
       } @else if (pendingPayments().length === 0) {
         <div class="empty-state card">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="1.5" class="empty-icon"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
-          <h3>All Bank Transfers Verified!</h3>
-          <p class="text-secondary">No pending deposit slips awaiting review right now.</p>
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="empty-icon text-emerald"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+          <h3>All Bank Transfers Verified</h3>
+          <p class="text-secondary">There are no pending deposit slips awaiting review at this time.</p>
         </div>
       } @else {
         <div class="table-responsive">
@@ -40,11 +39,11 @@ import { TeacherService } from '../../../core/services/teacher.service';
             <thead>
               <tr>
                 <th>Student</th>
-                <th>Course</th>
-                <th>Fee</th>
+                <th>Course Cohort</th>
+                <th>Amount</th>
                 <th>Transaction Ref</th>
-                <th>Date & Slip</th>
-                <th>Student Notes</th>
+                <th>Date & Receipt</th>
+                <th>Student Note</th>
                 <th>Verification Actions</th>
               </tr>
             </thead>
@@ -53,21 +52,23 @@ import { TeacherService } from '../../../core/services/teacher.service';
                 <tr>
                   <td>
                     <strong>{{ pay.studentName }}</strong>
-                    <div class="text-muted mono-num" style="font-size: 0.775rem;">{{ pay.studentEmail }}</div>
+                    <div class="text-muted mono-num" style="font-size: 0.75rem;">{{ pay.studentEmail }}</div>
                   </td>
-                  <td>{{ pay.courseTitle }}</td>
-                  <td class="mono-num font-bold text-emerald">\${{ pay.amount | number:'1.2-2' }}</td>
+                  <td>
+                    <span class="font-medium">{{ pay.courseTitle }}</span>
+                  </td>
+                  <td class="mono-num font-bold text-primary">\${{ pay.amount | number:'1.2-2' }}</td>
                   <td class="mono-num font-bold text-amber">{{ pay.transactionRef }}</td>
                   <td>
                     <div class="slip-cell">
                       <span class="text-muted" style="font-size: 0.75rem;">{{ pay.transferDate | date:'short' }}</span>
                       @if (pay.slipFileUrl) {
                         <button (click)="inspectSlip(pay)" class="btn btn-outline btn-sm">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                           Inspect Slip
                         </button>
                       } @else {
-                        <span class="text-muted">No file</span>
+                        <span class="text-muted" style="font-size: 0.75rem;">No receipt attached</span>
                       }
                     </div>
                   </td>
@@ -95,12 +96,12 @@ import { TeacherService } from '../../../core/services/teacher.service';
       @if (activeInspectPayment()) {
         <div class="modal-overlay" (click)="activeInspectPayment.set(null)">
           <div class="modal-content modal-content-lg" (click)="$event.stopPropagation()">
-            <button class="modal-close" (click)="activeInspectPayment.set(null)">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <button class="modal-close" (click)="activeInspectPayment.set(null)" title="Close" aria-label="Close">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
 
             <h3>Inspect Deposit Slip / Wire Receipt</h3>
-            <p class="text-secondary" style="margin-bottom: 1.5rem;">
+            <p class="text-secondary" style="margin-bottom: 1.25rem; font-size: 0.8125rem;">
               Submitted by <strong>{{ activeInspectPayment()?.studentName }}</strong> for <strong>{{ activeInspectPayment()?.courseTitle }}</strong>.
             </p>
 
@@ -108,28 +109,28 @@ import { TeacherService } from '../../../core/services/teacher.service';
               <div class="slip-meta-header">
                 <div>
                   <span class="label">Reference No:</span>
-                  <strong class="mono-num text-amber">{{ activeInspectPayment()?.transactionRef }}</strong>
+                  <strong class="mono-num text-amber font-bold">{{ activeInspectPayment()?.transactionRef }}</strong>
                 </div>
                 <div>
                   <span class="label">Course Fee:</span>
-                  <strong class="mono-num text-emerald">\${{ activeInspectPayment()?.amount | number:'1.2-2' }}</strong>
+                  <strong class="mono-num text-primary font-bold">\${{ activeInspectPayment()?.amount | number:'1.2-2' }}</strong>
                 </div>
               </div>
 
               <div class="slip-media-box">
                 <a [href]="activeInspectPayment()?.slipFileUrl" target="_blank" class="slip-link">
                   <div class="slip-doc-placeholder">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-muted"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                     <h4>{{ activeInspectPayment()?.originalSlipFileName || 'Deposit_Receipt.pdf' }}</h4>
-                    <span>Click to open or download original high-res slip file</span>
+                    <span>Click to open or download original high-res slip file &rarr;</span>
                   </div>
                 </a>
               </div>
             </div>
 
-            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
-              <button (click)="activeInspectPayment.set(null)" class="btn btn-secondary">Close</button>
-              <button (click)="approvePayment(activeInspectPayment()!)" class="btn btn-emerald">
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.25rem;">
+              <button (click)="activeInspectPayment.set(null)" class="btn btn-outline btn-sm">Close</button>
+              <button (click)="approvePayment(activeInspectPayment()!)" class="btn btn-emerald btn-sm">
                 Approve Transfer & Enroll Student
               </button>
             </div>
@@ -141,18 +142,18 @@ import { TeacherService } from '../../../core/services/teacher.service';
       @if (rejectingPayment()) {
         <div class="modal-overlay" (click)="rejectingPayment.set(null)">
           <div class="modal-content" (click)="$event.stopPropagation()">
-            <button class="modal-close" (click)="rejectingPayment.set(null)">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <button class="modal-close" (click)="rejectingPayment.set(null)" title="Close" aria-label="Close">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
 
             <h3>Reject Bank Transfer</h3>
-            <p class="text-secondary" style="margin-bottom: 1.5rem;">
-              Provide a reason note so {{ rejectingPayment()?.studentName }} can resolve the transfer mismatch.
+            <p class="text-secondary" style="margin-bottom: 1.25rem; font-size: 0.8125rem;">
+              Provide a reason note so {{ rejectingPayment()?.studentName }} can resolve the wire transaction mismatch.
             </p>
 
             <form (ngSubmit)="confirmReject()">
               <div class="form-group">
-                <label class="form-label">Rejection Reason</label>
+                <label class="form-label">Rejection Reason *</label>
                 <textarea
                   class="form-control"
                   [(ngModel)]="rejectNotes"
@@ -162,9 +163,9 @@ import { TeacherService } from '../../../core/services/teacher.service';
                   required></textarea>
               </div>
 
-              <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 0.75rem;">
-                <button type="button" (click)="rejectingPayment.set(null)" class="btn btn-secondary">Cancel</button>
-                <button type="submit" class="btn btn-danger">Confirm Rejection</button>
+              <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.25rem;">
+                <button type="button" (click)="rejectingPayment.set(null)" class="btn btn-outline btn-sm">Cancel</button>
+                <button type="submit" class="btn btn-danger btn-sm">Confirm Rejection</button>
               </div>
             </form>
           </div>
@@ -174,20 +175,21 @@ import { TeacherService } from '../../../core/services/teacher.service';
   `,
   styles: [`
     .verification-page {
-      padding: 3rem 1.5rem 5rem;
+      padding: 2.5rem 1.5rem 5rem;
     }
 
     .page-header {
-      margin-bottom: 2.5rem;
+      margin-bottom: 2rem;
     }
 
     .section-title-bar {
-      margin-bottom: 1.25rem;
+      margin-bottom: 1rem;
     }
 
-    .text-emerald { color: #059669; }
-    .text-amber { color: #d97706; }
-    .font-bold { font-weight: 700; }
+    .section-title-bar h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
+    }
 
     .slip-cell {
       display: flex;
@@ -197,31 +199,38 @@ import { TeacherService } from '../../../core/services/teacher.service';
     }
 
     .notes-cell {
-      max-width: 220px;
-      font-size: 0.85rem;
+      max-width: 200px;
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
     }
 
     .verify-btn-group {
       display: flex;
-      gap: 0.4rem;
+      gap: 0.35rem;
     }
 
     .slip-preview-container {
-      background: var(--bg-surface);
-      padding: 1.5rem;
+      background: var(--bg-card);
+      padding: 1.25rem;
     }
 
     .slip-meta-header {
       display: flex;
       justify-content: space-between;
       border-bottom: 1px solid var(--border-subtle);
-      padding-bottom: 1rem;
-      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.8125rem;
+    }
+
+    .slip-meta-header .label {
+      color: var(--text-muted);
+      margin-right: 0.35rem;
     }
 
     .slip-media-box {
       text-align: center;
-      padding: 2rem 1rem;
+      padding: 1.5rem 1rem;
     }
 
     .slip-link {
@@ -230,72 +239,31 @@ import { TeacherService } from '../../../core/services/teacher.service';
     }
 
     .slip-doc-placeholder {
-      background: var(--bg-card);
-      border: 2px dashed var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: 2rem;
+      background: var(--bg-subtle);
+      border: 1px dashed var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.75rem;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
       color: var(--text-primary);
       transition: var(--transition);
     }
 
     .slip-doc-placeholder:hover {
-      border-color: #4f46e5;
-      background: #eef2ff;
+      border-color: var(--border-focus);
+      background: #ffffff;
+    }
+
+    .slip-doc-placeholder h4 {
+      font-size: 0.875rem;
+      font-weight: 600;
     }
 
     .slip-doc-placeholder span {
-      font-size: 0.85rem;
+      font-size: 0.75rem;
       color: var(--text-muted);
-    }
-
-    .modal-close {
-      position: absolute;
-      top: 1.25rem;
-      right: 1.25rem;
-      background: #f1f5f9;
-      border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
-      border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .modal-close:hover {
-      background: #fee2e2;
-      color: #ef4444;
-    }
-
-    .loading-state, .empty-state {
-      text-align: center;
-      padding: 4rem 1rem;
-      color: var(--text-secondary);
-    }
-
-    .empty-icon {
-      margin-bottom: 1rem;
-    }
-
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid #e2e8f0;
-      border-top-color: #4f46e5;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 1rem;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
     }
   `]
 })

@@ -13,18 +13,18 @@ import { SystemService } from '../../core/services/system.service';
     <div class="auth-page">
       <div class="card auth-card">
         <div class="auth-header">
-          <span class="badge badge-emerald">New Student Enrollment</span>
-          <h2>Create Your Account</h2>
-          <p class="text-secondary">Join {{ systemService.academyName() }} to enroll in monthly courses and access classroom materials.</p>
+          <h2>Create your student account</h2>
+          <p class="text-secondary">Join {{ systemService.academyName() }} to enroll in professional accounting masterclasses.</p>
         </div>
 
         @if (errorMessage()) {
           <div class="error-banner">
-            {{ errorMessage() }}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="error-icon"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <span>{{ errorMessage() }}</span>
           </div>
         }
 
-        <form (ngSubmit)="register()">
+        <form (ngSubmit)="register()" class="auth-form">
           <div class="form-group">
             <label class="form-label">Full Name</label>
             <input
@@ -32,7 +32,8 @@ import { SystemService } from '../../core/services/system.service';
               class="form-control"
               [(ngModel)]="fullName"
               name="fullName"
-              placeholder="e.g. Jane Doe"
+              placeholder="e.g. Eleanor Vance"
+              autocomplete="name"
               required />
           </div>
 
@@ -43,18 +44,20 @@ import { SystemService } from '../../core/services/system.service';
               class="form-control"
               [(ngModel)]="email"
               name="email"
-              placeholder="e.g. jane@example.com"
+              placeholder="name@example.com"
+              autocomplete="email"
               required />
           </div>
 
           <div class="form-group">
-            <label class="form-label">Password (Min 6 characters)</label>
+            <label class="form-label">Password (Min. 6 characters)</label>
             <input
               type="password"
               class="form-control"
               [(ngModel)]="password"
               name="password"
               placeholder="••••••••"
+              autocomplete="new-password"
               minlength="6"
               required />
           </div>
@@ -66,6 +69,7 @@ import { SystemService } from '../../core/services/system.service';
               class="form-control"
               [(ngModel)]="phone"
               name="phone"
+              autocomplete="tel"
               placeholder="+1 (555) 000-0000" />
           </div>
 
@@ -75,15 +79,15 @@ import { SystemService } from '../../core/services/system.service';
         </form>
 
         <div class="auth-footer">
-          <span>Already registered?</span>
-          <a routerLink="/login">Log in here</a>
+          <span>Already have an account?</span>
+          <a routerLink="/login" class="auth-link">Sign in here</a>
         </div>
       </div>
     </div>
   `,
   styles: [`
     .auth-page {
-      min-height: calc(100vh - 72px);
+      min-height: calc(100vh - 64px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -91,43 +95,75 @@ import { SystemService } from '../../core/services/system.service';
     }
 
     .auth-card {
-      max-width: 480px;
+      max-width: 440px;
       width: 100%;
-      padding: 2.5rem;
+      padding: 2.25rem;
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
     }
 
     .auth-header {
       text-align: center;
-      margin-bottom: 2rem;
+      margin-bottom: 1.75rem;
     }
 
     .auth-header h2 {
-      margin: 0.5rem 0 0.25rem;
+      font-size: 1.375rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      margin-bottom: 0.35rem;
+    }
+
+    .auth-header p {
+      font-size: 0.8125rem;
     }
 
     .error-banner {
-      background: #fff1f2;
-      border: 1px solid #fecdd3;
-      color: #9f1239;
-      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--rose-light);
+      border: 1px solid var(--rose-border);
+      color: var(--rose);
+      padding: 0.65rem 0.85rem;
       border-radius: var(--radius-md);
-      font-size: 0.85rem;
-      margin-bottom: 1.5rem;
+      font-size: 0.8125rem;
+      margin-bottom: 1.25rem;
       font-weight: 500;
     }
 
-    .w-full {
-      width: 100%;
+    .error-icon {
+      flex-shrink: 0;
+    }
+
+    .auth-form {
+      display: flex;
+      flex-direction: column;
     }
 
     .auth-footer {
       text-align: center;
-      margin-top: 2rem;
-      font-size: 0.875rem;
+      margin-top: 1.75rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 0.8125rem;
       color: var(--text-secondary);
       display: flex;
       justify-content: center;
       gap: 0.35rem;
+    }
+
+    .auth-link {
+      color: var(--text-primary);
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .auth-link:hover {
+      color: var(--primary-hover);
     }
   `]
 })
@@ -159,7 +195,7 @@ export class RegisterComponent {
       },
       error: (err) => {
         this.loading.set(false);
-        this.errorMessage.set(err.error?.message || 'Registration failed.');
+        this.errorMessage.set(err.error?.message || 'Registration failed. Please check your inputs.');
       }
     });
   }

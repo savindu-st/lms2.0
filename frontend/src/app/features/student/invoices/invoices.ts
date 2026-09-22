@@ -12,9 +12,8 @@ import { SystemService } from '../../../core/services/system.service';
     <div class="container billing-page">
       <div class="page-header">
         <div>
-          <span class="badge badge-emerald">Financial Records</span>
           <h1>Invoices & Payment Receipts</h1>
-          <p class="text-secondary">Download official VAT/Tax compliant receipts for your professional development and tax deduction records.</p>
+          <p class="text-secondary">Download and inspect official tax-compliant receipts for your records and accounting development expenses.</p>
         </div>
       </div>
 
@@ -25,8 +24,9 @@ import { SystemService } from '../../../core/services/system.service';
         </div>
       } @else if (invoices().length === 0) {
         <div class="empty-state card">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="empty-icon"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
           <h3>No payment records found</h3>
-          <p class="text-secondary">When your bank transfer enrollment is verified, your official invoices will appear here.</p>
+          <p class="text-secondary">When your bank wire enrollment is verified by the instructor, your official tax invoices will appear here.</p>
         </div>
       } @else {
         <div class="table-responsive">
@@ -36,7 +36,7 @@ import { SystemService } from '../../../core/services/system.service';
                 <th>Invoice #</th>
                 <th>Course / Masterclass</th>
                 <th>Date Issued</th>
-                <th>Amount</th>
+                <th>Tuition Fee</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -45,9 +45,11 @@ import { SystemService } from '../../../core/services/system.service';
               @for (inv of invoices(); track inv.id) {
                 <tr>
                   <td class="mono-num font-bold">{{ inv.invoiceNumber }}</td>
-                  <td>{{ inv.courseTitle }}</td>
-                  <td class="mono-num text-muted">{{ inv.issuedAt | date:'mediumDate' }}</td>
-                  <td class="mono-num font-bold text-emerald">\${{ inv.total | number:'1.2-2' }}</td>
+                  <td>
+                    <span class="font-medium">{{ inv.courseTitle }}</span>
+                  </td>
+                  <td class="mono-num text-muted" style="font-size: 0.8125rem;">{{ inv.issuedAt | date:'mediumDate' }}</td>
+                  <td class="mono-num font-bold text-primary">\${{ inv.total | number:'1.2-2' }}</td>
                   <td>
                     <span class="badge badge-emerald">PAID</span>
                   </td>
@@ -68,8 +70,8 @@ import { SystemService } from '../../../core/services/system.service';
       @if (activeInvoice()) {
         <div class="modal-overlay" (click)="onBackdropClick($event)">
           <div class="modal-content modal-content-lg invoice-modal">
-            <button class="modal-close" (click)="activeInvoice.set(null)">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <button class="modal-close" (click)="activeInvoice.set(null)" title="Close" aria-label="Close">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
 
             <!-- Printable Invoice Sheet -->
@@ -77,7 +79,7 @@ import { SystemService } from '../../../core/services/system.service';
               <div class="invoice-top">
                 <div class="inst-brand">
                   <h2>{{ systemService.academyName() }}</h2>
-                  <span>Professional School of Accountancy</span>
+                  <span class="academy-tag">Professional School of Accountancy</span>
                   <p class="inst-sub">Official Academic Receipt &bull; Instructor: {{ systemService.instructorName() }}</p>
                 </div>
                 <div class="inv-meta">
@@ -87,14 +89,14 @@ import { SystemService } from '../../../core/services/system.service';
                     <span class="val mono-num">{{ activeInvoice()?.invoiceNumber }}</span>
                   </div>
                   <div class="inv-meta-row">
-                    <span class="label">Date:</span>
+                    <span class="label">Issued Date:</span>
                     <span class="val mono-num">{{ activeInvoice()?.issuedAt | date:'mediumDate' }}</span>
                   </div>
                 </div>
               </div>
 
               <div class="bill-to-section">
-                <span class="bill-label">BILLED TO:</span>
+                <span class="bill-label">BILLED TO</span>
                 <h4>{{ activeInvoice()?.studentName }}</h4>
                 <p class="mono-num">{{ activeInvoice()?.studentEmail }}</p>
               </div>
@@ -113,26 +115,26 @@ import { SystemService } from '../../../core/services/system.service';
                   <tr>
                     <td>
                       <strong>{{ activeInvoice()?.courseTitle }}</strong>
-                      <div class="text-muted" style="font-size: 0.8rem;">Full curriculum access with video lectures, workbook templates & instructor evaluation</div>
+                      <div class="text-muted" style="font-size: 0.75rem;">Full cohort access, modular video lectures, workbook templates, and instructor evaluations</div>
                     </td>
                     <td class="text-right mono-num">\${{ activeInvoice()?.subtotal | number:'1.2-2' }}</td>
                     <td class="text-right mono-num">1</td>
-                    <td class="text-right mono-num">\${{ activeInvoice()?.subtotal | number:'1.2-2' }}</td>
+                    <td class="text-right mono-num font-bold">\${{ activeInvoice()?.subtotal | number:'1.2-2' }}</td>
                   </tr>
                 </tbody>
               </table>
 
               <div class="inv-totals-box">
                 <div class="inv-total-row">
-                  <span>Subtotal:</span>
+                  <span>Subtotal</span>
                   <span class="mono-num">\${{ activeInvoice()?.subtotal | number:'1.2-2' }}</span>
                 </div>
                 <div class="inv-total-row">
-                  <span>Tax (0.00%):</span>
+                  <span>Tax (0.00%)</span>
                   <span class="mono-num">\${{ activeInvoice()?.taxAmount | number:'1.2-2' }}</span>
                 </div>
                 <div class="inv-total-row grand-total">
-                  <span>Total Paid:</span>
+                  <span>Total Paid</span>
                   <span class="mono-num">\${{ activeInvoice()?.total | number:'1.2-2' }} USD</span>
                 </div>
               </div>
@@ -143,9 +145,9 @@ import { SystemService } from '../../../core/services/system.service';
             </div>
 
             <div class="modal-footer">
-              <button (click)="printReceipt()" class="btn btn-emerald">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-                Print / Save PDF
+              <button (click)="printReceipt()" class="btn btn-primary btn-sm">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                Print Receipt / PDF
               </button>
             </div>
           </div>
@@ -155,53 +157,22 @@ import { SystemService } from '../../../core/services/system.service';
   `,
   styles: [`
     .billing-page {
-      padding: 3rem 1.5rem 5rem;
+      padding: 2.5rem 1.5rem 5rem;
     }
 
     .page-header {
-      margin-bottom: 2.5rem;
-    }
-
-    .font-bold {
-      font-weight: 700;
-    }
-
-    .text-emerald {
-      color: #059669;
+      margin-bottom: 2rem;
     }
 
     .invoice-modal {
       position: relative;
-      background: #ffffff;
-    }
-
-    .modal-close {
-      position: absolute;
-      top: 1.25rem;
-      right: 1.25rem;
-      background: #f1f5f9;
-      border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
-      border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .modal-close:hover {
-      background: #fee2e2;
-      color: #ef4444;
     }
 
     .invoice-sheet {
       background: #ffffff;
-      color: #0f172a;
-      padding: 2.5rem;
-      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 2.25rem;
       position: relative;
       overflow: hidden;
       margin-bottom: 1.5rem;
@@ -210,28 +181,28 @@ import { SystemService } from '../../../core/services/system.service';
     .invoice-top {
       display: flex;
       justify-content: space-between;
-      border-bottom: 2px solid #e2e8f0;
+      border-bottom: 1px solid var(--border-subtle);
       padding-bottom: 1.5rem;
       margin-bottom: 1.5rem;
     }
 
     .inst-brand h2 {
-      color: #0f172a;
-      font-size: 1.5rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
     }
 
-    .inst-brand span {
-      font-size: 0.85rem;
+    .academy-tag {
+      font-size: 0.75rem;
       font-weight: 600;
-      color: #4f46e5;
+      color: var(--text-muted);
       text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
     .inst-sub {
       font-size: 0.75rem;
-      color: #64748b;
+      color: var(--text-muted);
       margin-top: 0.25rem;
     }
 
@@ -240,71 +211,71 @@ import { SystemService } from '../../../core/services/system.service';
     }
 
     .inv-title-tag {
-      font-size: 1.25rem;
+      font-size: 1.125rem;
       font-weight: 800;
-      color: #0f172a;
-      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+      margin-bottom: 0.35rem;
+      letter-spacing: 0.05em;
     }
 
     .inv-meta-row {
-      font-size: 0.85rem;
+      font-size: 0.8125rem;
       display: flex;
       justify-content: flex-end;
       gap: 0.5rem;
     }
 
     .inv-meta-row .label {
-      color: #64748b;
+      color: var(--text-muted);
     }
 
     .inv-meta-row .val {
-      font-weight: 700;
-      color: #0f172a;
+      font-weight: 600;
+      color: var(--text-primary);
     }
 
     .bill-to-section {
-      margin-bottom: 2rem;
+      margin-bottom: 1.75rem;
     }
 
     .bill-label {
-      font-size: 0.725rem;
+      font-size: 0.6875rem;
       font-weight: 700;
-      color: #64748b;
+      color: var(--text-muted);
       letter-spacing: 0.05em;
     }
 
     .bill-to-section h4 {
-      font-size: 1.15rem;
-      color: #0f172a;
-      margin: 0.25rem 0;
+      font-size: 1.05rem;
+      margin: 0.2rem 0;
     }
 
     .bill-to-section p {
-      font-size: 0.85rem;
-      color: #64748b;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
     }
 
     .inv-table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 2rem;
+      margin-bottom: 1.75rem;
     }
 
     .inv-table th {
-      background: #f8fafc;
-      padding: 0.75rem 1rem;
-      font-size: 0.75rem;
+      background: var(--bg-subtle);
+      padding: 0.65rem 0.85rem;
+      font-size: 0.6875rem;
       text-transform: uppercase;
-      color: #475569;
-      border-bottom: 1px solid #e2e8f0;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-subtle);
       text-align: left;
     }
 
     .inv-table td {
-      padding: 1rem;
-      border-bottom: 1px solid #f1f5f9;
-      color: #1e293b;
-      font-size: 0.9rem;
+      padding: 0.85rem;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.8125rem;
     }
 
     .text-right {
@@ -312,66 +283,46 @@ import { SystemService } from '../../../core/services/system.service';
     }
 
     .inv-totals-box {
-      width: 280px;
+      width: 260px;
       margin-left: auto;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
 
     .inv-total-row {
       display: flex;
       justify-content: space-between;
-      padding: 0.35rem 0;
-      font-size: 0.9rem;
-      color: #475569;
+      padding: 0.3rem 0;
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
     }
 
     .inv-total-row.grand-total {
-      border-top: 2px solid #0f172a;
-      margin-top: 0.5rem;
-      padding-top: 0.75rem;
-      font-size: 1.15rem;
-      font-weight: 800;
-      color: #0f172a;
+      border-top: 1px solid var(--text-primary);
+      margin-top: 0.4rem;
+      padding-top: 0.6rem;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
     }
 
     .paid-stamp {
       position: absolute;
-      bottom: 2.5rem;
-      left: 2.5rem;
-      border: 3px dashed #10b981;
-      color: #10b981;
-      font-size: 1.15rem;
-      font-weight: 900;
-      padding: 0.4rem 1.25rem;
-      border-radius: 6px;
-      transform: rotate(-10deg);
+      bottom: 2rem;
+      left: 2.25rem;
+      border: 2px solid var(--emerald);
+      color: var(--emerald);
+      font-size: 0.9375rem;
+      font-weight: 800;
+      padding: 0.3rem 0.85rem;
+      border-radius: var(--radius-sm);
+      transform: rotate(-8deg);
       letter-spacing: 0.08em;
-      opacity: 0.85;
+      opacity: 0.9;
     }
 
     .modal-footer {
       display: flex;
       justify-content: flex-end;
-    }
-
-    .loading-state, .empty-state {
-      text-align: center;
-      padding: 4rem 1rem;
-      color: var(--text-secondary);
-    }
-
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid #e2e8f0;
-      border-top-color: #4f46e5;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 1rem;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
     }
   `]
 })
