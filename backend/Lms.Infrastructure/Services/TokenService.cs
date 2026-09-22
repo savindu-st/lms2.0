@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Lms.Core.Entities;
 using Lms.Core.Interfaces;
@@ -19,6 +20,11 @@ public class TokenService : ITokenService
 
     public string GenerateToken(User user)
     {
+        return GenerateAccessToken(user);
+    }
+
+    public string GenerateAccessToken(User user)
+    {
         var secretKey = _configuration["Jwt:SecretKey"] ?? "AccountingLmsSuperSecretKey2026!WithHighEntropyForSecurity";
         var issuer = _configuration["Jwt:Issuer"] ?? "AccountingLms";
         var audience = _configuration["Jwt:Audience"] ?? "AccountingLmsApp";
@@ -37,7 +43,7 @@ public class TokenService : ITokenService
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddDays(7),
+            Expires = DateTime.UtcNow.AddMinutes(15),
             Issuer = issuer,
             Audience = audience,
             SigningCredentials = creds
@@ -48,4 +54,26 @@ public class TokenService : ITokenService
 
         return tokenHandler.WriteToken(token);
     }
+
+    public RefreshToken GenerateRefreshToken(Guid userId)
+    {
+        var randomBytes = new byte[64];
+        using (var rng = RandomNumberGenerator.Create())
+        {
+            rng.GetBytes(randomBytes);
+        }
+
+        return new RefreshToken
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            Token = Convert.ToBase64String(randomBytes)
+                .Replace("+", "-")
+                .Replace("/", "_")
+                .Replace("=", ""),
+            ExpiresAt = DateTime.UtcNow.AddDays(7),
+            CreatedAt = DateTime.UtcNow
+        };
+    }
 }
+

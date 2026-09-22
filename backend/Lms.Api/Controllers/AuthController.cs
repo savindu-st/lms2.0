@@ -60,4 +60,29 @@ public class AuthController : ControllerBase
 
         return Ok(user);
     }
+
+    [HttpPost("refresh")]
+    public async Task<ActionResult<TokenRefreshResponseDto>> RefreshToken([FromBody] TokenRefreshRequestDto dto)
+    {
+        try
+        {
+            var response = await _authService.RefreshTokenAsync(dto.RefreshToken);
+            return Ok(response);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("revoke")]
+    public async Task<IActionResult> RevokeToken([FromBody] RevokeTokenRequestDto dto)
+    {
+        var result = await _authService.RevokeTokenAsync(dto.RefreshToken);
+        if (!result)
+        {
+            return NotFound(new { message = "Token not found or already revoked." });
+        }
+        return Ok(new { message = "Token revoked successfully." });
+    }
 }

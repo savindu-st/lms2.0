@@ -21,7 +21,27 @@ public static class DbInitializer
             }
             catch
             {
-                // Tables may already exist
+                // Tables may already exist - ensure newly added RefreshTokens table exists
+                try
+                {
+                    await context.Database.ExecuteSqlRawAsync(@"
+                        CREATE TABLE IF NOT EXISTS ""RefreshTokens"" (
+                            ""Id"" uuid NOT NULL PRIMARY KEY,
+                            ""UserId"" uuid NOT NULL REFERENCES ""Users""(""Id"") ON DELETE CASCADE,
+                            ""Token"" character varying(150) NOT NULL,
+                            ""ExpiresAt"" timestamp with time zone NOT NULL,
+                            ""CreatedAt"" timestamp with time zone NOT NULL,
+                            ""RevokedAt"" timestamp with time zone NULL,
+                            ""ReplacedByToken"" text NULL
+                        );
+                        CREATE UNIQUE INDEX IF NOT EXISTS ""IX_RefreshTokens_Token"" ON ""RefreshTokens"" (""Token"");
+                        CREATE INDEX IF NOT EXISTS ""IX_RefreshTokens_UserId"" ON ""RefreshTokens"" (""UserId"");
+                    ");
+                }
+                catch
+                {
+                    // Ignore if in non-relational or already created
+                }
             }
         }
         else

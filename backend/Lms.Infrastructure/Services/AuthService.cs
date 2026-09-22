@@ -53,10 +53,15 @@ public class AuthService : IAuthService
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        var token = _tokenService.GenerateToken(user);
+        var accessToken = _tokenService.GenerateAccessToken(user);
+        var refreshToken = _tokenService.GenerateRefreshToken(user.Id);
+        _context.RefreshTokens.Add(refreshToken);
+        await _context.SaveChangesAsync();
+
         return new AuthResponseDto
         {
-            Token = token,
+            Token = accessToken,
+            RefreshToken = refreshToken.Token,
             User = MapToDto(user)
         };
     }
@@ -70,12 +75,103 @@ public class AuthService : IAuthService
             throw new UnauthorizedAccessException("Invalid email address or password.");
         }
 
-        var token = _tokenService.GenerateToken(user);
+        var accessToken = _tokenService.GenerateAccessToken(user);
+        var refreshToken = _tokenService.GenerateRefreshToken(user.Id);
+        _context.RefreshTokens.Add(refreshToken);
+        await _context.SaveChangesAsync();
+
         return new AuthResponseDto
         {
-            Token = token,
+            Token = accessToken,
+            RefreshToken = refreshToken.Token,
             User = MapToDto(user)
         };
+    }
+
+    public async Task<TokenRefreshResponseDto> RefreshTokenAsync(string refreshToken)
+    {
+        if (string.IsNullOrWhiteSpace(refreshToken))
+        {
+            throw new UnauthorizedAccessException("Refresh token is required.");
+        }
+
+        var existingToken = await _context.RefreshTokens
+            .Include(rt => rt.User)
+            .FirstOrDefaultAsync(rt => rt.Token == refreshToken);
+
+        if (existingToken == null)
+        {
+            throw new UnauthorizedAccessException("Invalid refresh token.");
+        }
+
+        // Check if token was previously revoked
+        if (existingToken.IsRevoked)
+        {
+            // 30-second rotation grace period defense
+            var timeSinceRevoked = DateTime.UtcNow - existingToken.RevokedAt!.Value;
+            if (timeSinceRevoked <= TimeSpan.FromSeconds(30) && !string.IsNullOrEmpty(existingToken.ReplacedByToken))
+            {
+                var replacementToken = await _context.RefreshTokens
+                    .FirstOrDefaultAsync(rt => rt.Token == existingToken.ReplacedByToken);
+
+                if (replacementToken != null && replacementToken.IsActive)
+                {
+                    var graceAccessToken = _tokenService.GenerateAccessToken(existingToken.User);
+                    return new TokenRefreshResponseDto
+                    {
+                        AccessToken = graceAccessToken,
+                        RefreshToken = replacementToken.Token
+                    };
+                }
+            }
+
+            // Revoked beyond grace period -> potential replay attack! Invalidate all tokens for user.
+            var compromisedUserTokens = await _context.RefreshTokens
+                .Where(rt => rt.UserId == existingToken.UserId && rt.RevokedAt == null)
+                .ToListAsync();
+
+            foreach (var t in compromisedUserTokens)
+            {
+                t.RevokedAt = DateTime.UtcNow;
+            }
+            await _context.SaveChangesAsync();
+
+            throw new UnauthorizedAccessException("Refresh token compromise detected. All active sessions have been invalidated.");
+        }
+
+        if (existingToken.IsExpired)
+        {
+            throw new UnauthorizedAccessException("Refresh token has expired. Please sign in again.");
+        }
+
+        // Active token: Rotate token
+        existingToken.RevokedAt = DateTime.UtcNow;
+
+        var newRefreshToken = _tokenService.GenerateRefreshToken(existingToken.UserId);
+        existingToken.ReplacedByToken = newRefreshToken.Token;
+
+        _context.RefreshTokens.Add(newRefreshToken);
+        await _context.SaveChangesAsync();
+
+        var newAccessToken = _tokenService.GenerateAccessToken(existingToken.User);
+
+        return new TokenRefreshResponseDto
+        {
+            AccessToken = newAccessToken,
+            RefreshToken = newRefreshToken.Token
+        };
+    }
+
+    public async Task<bool> RevokeTokenAsync(string refreshToken)
+    {
+        if (string.IsNullOrWhiteSpace(refreshToken)) return false;
+
+        var token = await _context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == refreshToken);
+        if (token == null || token.IsRevoked) return false;
+
+        token.RevokedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+        return true;
     }
 
     public async Task<UserDto?> GetCurrentUserAsync(Guid userId)

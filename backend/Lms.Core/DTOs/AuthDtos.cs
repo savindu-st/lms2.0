@@ -39,5 +39,25 @@ public class UserDto
 public class AuthResponseDto
 {
     public string Token { get; set; } = string.Empty;
+    public string? RefreshToken { get; set; }
     public UserDto User { get; set; } = null!;
 }
+
+public class TokenRefreshRequestDto
+{
+    [Required]
+    public string RefreshToken { get; set; } = string.Empty;
+}
+
+public class TokenRefreshResponseDto
+{
+    public string AccessToken { get; set; } = string.Empty;
+    public string RefreshToken { get; set; } = string.Empty;
+}
+
+public class RevokeTokenRequestDto
+{
+    [Required]
+    public string RefreshToken { get; set; } = string.Empty;
+}
+

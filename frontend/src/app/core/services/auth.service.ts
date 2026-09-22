@@ -1,31 +1,33 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, of, catchError } from 'rxjs';
 import { AuthResponse, User, UserRole } from '../models/models';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private http = inject(HttpClient);
+  private router = inject(Router);
   private apiUrl = 'http://localhost:5000/api/auth';
 
   private userSignal = signal<User | null>(this.getStoredUser());
-  private tokenSignal = signal<string | null>(this.getStoredToken());
 
   currentUser = this.userSignal.asReadonly();
-  token = this.tokenSignal.asReadonly();
 
-  isLoggedIn = computed(() => !!this.tokenSignal() && !!this.userSignal());
+  isLoggedIn = computed(() => !!this.userSignal());
   isTeacher = computed(() => this.userSignal()?.role === UserRole.Teacher);
   isStudent = computed(() => this.userSignal()?.role === UserRole.Student);
 
-  constructor() {
-    if (this.tokenSignal()) {
-      this.fetchCurrentUser().subscribe({
-        error: () => this.logout()
-      });
-    }
+  initSession(): Observable<User | null> {
+    return this.fetchCurrentUser().pipe(
+      catchError(() => {
+        this.userSignal.set(null);
+        localStorage.removeItem('lms_user');
+        return of(null);
+      })
+    );
   }
 
   register(data: { fullName: string; email: string; password: string; phoneNumber?: string }): Observable<AuthResponse> {
@@ -50,21 +52,18 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('lms_token');
-    localStorage.removeItem('lms_user');
-    this.tokenSignal.set(null);
-    this.userSignal.set(null);
+    this.http.post(`${this.apiUrl}/logout`, {}).pipe(
+      catchError(() => of(null))
+    ).subscribe(() => {
+      localStorage.removeItem('lms_user');
+      this.userSignal.set(null);
+      this.router.navigate(['/login']);
+    });
   }
 
   private handleAuthSuccess(res: AuthResponse): void {
-    localStorage.setItem('lms_token', res.token);
     localStorage.setItem('lms_user', JSON.stringify(res.user));
-    this.tokenSignal.set(res.token);
     this.userSignal.set(res.user);
-  }
-
-  private getStoredToken(): string | null {
-    return localStorage.getItem('lms_token');
   }
 
   private getStoredUser(): User | null {

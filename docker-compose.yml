@@ -41,6 +41,8 @@ services:
       - Jwt__SecretKey=${JWT_SECRET_KEY}
       - Jwt__Issuer=${JWT_ISSUER}
       - Jwt__Audience=${JWT_AUDIENCE}
+    volumes:
+      - lms_keys:/app/keys
     depends_on:
       - lms-api
     networks:
@@ -62,6 +64,8 @@ services:
 volumes:
   lms_uploads:
     name: lms_uploads
+  lms_keys:
+    name: lms_keys
 
 networks:
   lms-network:

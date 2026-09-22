@@ -6,12 +6,16 @@ namespace Lms.Core.Interfaces;
 public interface ITokenService
 {
     string GenerateToken(User user);
+    string GenerateAccessToken(User user);
+    RefreshToken GenerateRefreshToken(Guid userId);
 }
 
 public interface IAuthService
 {
     Task<AuthResponseDto> RegisterAsync(RegisterDto dto);
     Task<AuthResponseDto> LoginAsync(LoginDto dto);
+    Task<TokenRefreshResponseDto> RefreshTokenAsync(string refreshToken);
+    Task<bool> RevokeTokenAsync(string refreshToken);
     Task<UserDto?> GetCurrentUserAsync(Guid userId);
 }
 
