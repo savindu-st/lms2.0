@@ -22,42 +22,21 @@ import { AuthService } from '../../../core/services/auth.service';
 
         @if (paymentSuccess()) {
           <div class="success-state">
-            <div class="success-icon" [class.success-amber]="completedPayment()?.status === 1">
-              <svg *ngIf="completedPayment()?.status === 2" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              <svg *ngIf="completedPayment()?.status === 1" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <div class="success-icon success-amber">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"></circle>
                 <polyline points="12 6 12 12 14 14"></polyline>
               </svg>
             </div>
 
-            <h3 *ngIf="completedPayment()?.status === 2">Payment Successful!</h3>
-            <h3 *ngIf="completedPayment()?.status === 1">Bank Transfer Slip Submitted!</h3>
+            <h3>Bank Transfer Slip Submitted!</h3>
 
-            <p class="success-desc" *ngIf="completedPayment()?.status === 2">
-              You are now officially enrolled in <strong>{{ course.title }}</strong> with <strong>{{ course.accessDurationDays }} days</strong> of access.
+            <p class="success-desc">
+              Your bank transfer reference <strong>{{ completedPayment()?.transactionRef }}</strong> and receipt have been submitted to the academy instructor. Your enrollment will be activated as soon as your payment is verified!
             </p>
-            <p class="success-desc" *ngIf="completedPayment()?.status === 1">
-              Your bank transfer reference <strong>{{ completedPayment()?.transactionRef }}</strong> and receipt have been submitted to the academy instructor. You will receive immediate classroom access once approved!
-            </p>
-
-            <div class="invoice-summary" *ngIf="completedPayment()?.invoice">
-              <div class="invoice-row">
-                <span>Invoice Number:</span>
-                <span class="mono-num">{{ completedPayment()?.invoice?.invoiceNumber }}</span>
-              </div>
-              <div class="invoice-row">
-                <span>Amount Paid:</span>
-                <span class="mono-num text-emerald">\${{ completedPayment()?.invoice?.total | number:'1.2-2' }}</span>
-              </div>
-            </div>
 
             <div class="success-actions">
-              <button *ngIf="completedPayment()?.status === 2" (click)="onSuccessDone(true)" class="btn btn-emerald btn-lg">
-                Enter Classroom Player
-              </button>
-              <button (click)="onSuccessDone(false)" class="btn btn-secondary btn-lg">
+              <button (click)="onSuccessDone(false)" class="btn btn-primary btn-lg">
                 View My Dashboard
               </button>
             </div>
@@ -79,168 +58,90 @@ import { AuthService } from '../../../core/services/auth.service';
           </div>
 
           <div class="price-banner">
-            <span class="price-label">One-Time Course Fee</span>
+            <span class="price-label">Tuition Fee</span>
             <span class="price-value mono-num">\${{ course.price | number:'1.2-2' }}</span>
           </div>
 
-          <!-- Payment Tabs -->
-          <div class="payment-tabs">
-            <button
-              type="button"
-              class="tab-btn"
-              [class.active]="selectedTab === 'card'"
-              (click)="selectedTab = 'card'">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-              Instant Online Checkout
-            </button>
-            <button
-              type="button"
-              class="tab-btn"
-              [class.active]="selectedTab === 'bank'"
-              (click)="selectedTab = 'bank'">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-              Bank Transfer / Slip Upload
-            </button>
-          </div>
+          <!-- Official Bank Transfer & Slip Submission -->
+          <div class="bank-transfer-container">
+            <div class="bank-details-box">
+              <h4>Official Instructor Bank Details</h4>
+              @if (bankDetails?.accountNumber) {
+                <div class="bank-grid">
+                  <div class="bank-item" *ngIf="bankDetails?.bankName">
+                    <span class="label">Bank Name:</span>
+                    <span class="val">{{ bankDetails?.bankName }}</span>
+                  </div>
+                  <div class="bank-item" *ngIf="bankDetails?.accountHolder">
+                    <span class="label">Beneficiary Name:</span>
+                    <span class="val">{{ bankDetails?.accountHolder }}</span>
+                  </div>
+                  <div class="bank-item">
+                    <span class="label">Account Number:</span>
+                    <span class="val mono-num">{{ bankDetails?.accountNumber }}</span>
+                  </div>
+                  <div class="bank-item" *ngIf="bankDetails?.routingOrSwift">
+                    <span class="label">SWIFT / Routing:</span>
+                    <span class="val mono-num">{{ bankDetails?.routingOrSwift }}</span>
+                  </div>
+                </div>
+                <p class="bank-note" *ngIf="bankDetails?.transferInstructions">{{ bankDetails?.transferInstructions }}</p>
+              } @else {
+                <p class="text-secondary" style="font-size: 0.85rem; margin-bottom: 0.5rem;">
+                  {{ bankDetails?.transferInstructions || 'Please contact your instructor or academy administration to obtain direct wire coordinates.' }}
+                </p>
+                <p class="bank-note">Once you complete the deposit at your bank, upload your transfer receipt or slip below to request immediate enrollment verification.</p>
+              }
+            </div>
 
-          <!-- Tab 1: Instant Card Checkout -->
-          @if (selectedTab === 'card') {
-            <form (ngSubmit)="handleInstantCheckout()" class="checkout-form">
+            <form (ngSubmit)="handleBankTransferSubmit()" class="checkout-form">
               <div class="form-group">
-                <label class="form-label">Name on Card</label>
+                <label class="form-label">Transfer Transaction / Reference Number *</label>
                 <input
                   type="text"
-                  class="form-control"
-                  [(ngModel)]="cardHolderName"
-                  name="cardHolder"
-                  placeholder="Cardholder Full Name"
+                  class="form-control mono-num"
+                  [(ngModel)]="bankRef"
+                  name="bankRef"
+                  placeholder="e.g. WIRE-8849201 or REF123456"
                   required />
               </div>
 
               <div class="form-group">
-                <label class="form-label">Card Number</label>
-                <div class="card-input-wrapper">
+                <label class="form-label">Upload Bank Slip / Receipt (Image or PDF) *</label>
+                <div class="file-upload-box" [class.file-selected]="slipFile">
                   <input
-                    type="text"
-                    class="form-control mono-num"
-                    [(ngModel)]="cardNumber"
-                    name="cardNumber"
-                    placeholder="1234 5678 9012 3456"
-                    maxlength="19"
-                    required />
-                  <span class="card-chip">CARD</span>
+                    type="file"
+                    id="slipFileInput"
+                    (change)="onFileSelected($event)"
+                    accept="image/*,application/pdf"
+                    class="file-input-hidden" />
+                  <label for="slipFileInput" class="file-upload-label">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    <span *ngIf="!slipFile">Click to upload deposit slip / wire receipt</span>
+                    <span *ngIf="slipFile" class="file-name-text">{{ slipFile.name }} ({{ (slipFile.size / 1024).toFixed(0) }} KB)</span>
+                  </label>
                 </div>
               </div>
 
-              <div class="form-row">
-                <div class="form-group half">
-                  <label class="form-label">Expiry</label>
-                  <input type="text" class="form-control mono-num" [(ngModel)]="expiry" name="expiry" placeholder="MM/YY" maxlength="5" required />
-                </div>
-                <div class="form-group half">
-                  <label class="form-label">CVC</label>
-                  <input type="text" class="form-control mono-num" [(ngModel)]="cvc" name="cvc" placeholder="CVC" maxlength="4" required />
-                </div>
+              <div class="form-group">
+                <label class="form-label">Optional Notes for Instructor</label>
+                <textarea
+                  class="form-control"
+                  [(ngModel)]="bankNotes"
+                  name="bankNotes"
+                  rows="2"
+                  placeholder="Any specific note regarding your wire or bank deposit..."></textarea>
               </div>
 
-              <div class="instant-guarantee">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                <span>Instant activation: Gain classroom access immediately upon clicking Pay.</span>
-              </div>
-
-              <button type="submit" [disabled]="loading() || !cardHolderName || !cardNumber || !expiry || !cvc" class="btn btn-emerald btn-lg w-full">
+              <button type="submit" [disabled]="loading() || !bankRef || !slipFile" class="btn btn-primary btn-lg w-full">
                 @if (loading()) {
-                  <span>Processing...</span>
+                  <span>Uploading & Submitting...</span>
                 } @else {
-                  <span>Pay \${{ course.price | number:'1.2-2' }} & Activate Course</span>
+                  <span>Submit Slip for Teacher Verification</span>
                 }
               </button>
             </form>
-          }
-
-          <!-- Tab 2: Bank Transfer -->
-          @if (selectedTab === 'bank') {
-            <div class="bank-transfer-container">
-              <!-- Bank details display -->
-              <div class="bank-details-box">
-                <h4>Official Instructor Bank Details</h4>
-                @if (bankDetails?.accountNumber) {
-                  <div class="bank-grid">
-                    <div class="bank-item" *ngIf="bankDetails?.bankName">
-                      <span class="label">Bank Name:</span>
-                      <span class="val">{{ bankDetails?.bankName }}</span>
-                    </div>
-                    <div class="bank-item" *ngIf="bankDetails?.accountHolder">
-                      <span class="label">Beneficiary Name:</span>
-                      <span class="val">{{ bankDetails?.accountHolder }}</span>
-                    </div>
-                    <div class="bank-item">
-                      <span class="label">Account Number:</span>
-                      <span class="val mono-num">{{ bankDetails?.accountNumber }}</span>
-                    </div>
-                    <div class="bank-item" *ngIf="bankDetails?.routingOrSwift">
-                      <span class="label">SWIFT / Routing:</span>
-                      <span class="val mono-num">{{ bankDetails?.routingOrSwift }}</span>
-                    </div>
-                  </div>
-                  <p class="bank-note" *ngIf="bankDetails?.transferInstructions">{{ bankDetails?.transferInstructions }}</p>
-                } @else {
-                  <p class="text-secondary" style="font-size: 0.85rem; margin-bottom: 0.5rem;">
-                    {{ bankDetails?.transferInstructions || 'Please contact your instructor or academy administration to obtain direct wire coordinates.' }}
-                  </p>
-                  <p class="bank-note">Once you complete the deposit at your bank, upload your transfer receipt or slip below to request immediate enrollment verification.</p>
-                }
-              </div>
-
-              <form (ngSubmit)="handleBankTransferSubmit()" class="checkout-form">
-                <div class="form-group">
-                  <label class="form-label">Transfer Transaction / Reference Number *</label>
-                  <input
-                    type="text"
-                    class="form-control mono-num"
-                    [(ngModel)]="bankRef"
-                    name="bankRef"
-                    placeholder="e.g. WIRE-8849201 or REF123456"
-                    required />
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label">Upload Bank Slip / Receipt (Image or PDF) *</label>
-                  <div class="file-upload-box" [class.file-selected]="slipFile">
-                    <input
-                      type="file"
-                      id="slipFileInput"
-                      (change)="onFileSelected($event)"
-                      accept="image/*,application/pdf"
-                      class="file-input-hidden" />
-                    <label for="slipFileInput" class="file-upload-label">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                      <span *ngIf="!slipFile">Click to upload deposit slip / wire receipt</span>
-                      <span *ngIf="slipFile" class="file-name-text">{{ slipFile.name }} ({{ (slipFile.size / 1024).toFixed(0) }} KB)</span>
-                    </label>
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label">Optional Notes for Instructor</label>
-                  <textarea
-                    class="form-control"
-                    [(ngModel)]="bankNotes"
-                    name="bankNotes"
-                    rows="2"
-                    placeholder="Any specific note regarding your wire or bank deposit..."></textarea>
-                </div>
-
-                <button type="submit" [disabled]="loading() || !bankRef || !slipFile" class="btn btn-primary btn-lg w-full">
-                  @if (loading()) {
-                    <span>Uploading & Submitting...</span>
-                  } @else {
-                    <span>Submit Slip for Teacher Verification</span>
-                  }
-                </button>
-              </form>
-            </div>
-          }
+          </div>
         }
       </div>
     </div>
@@ -326,79 +227,6 @@ import { AuthService } from '../../../core/services/auth.service';
       font-size: 1.75rem;
       font-weight: 800;
       color: #059669;
-    }
-
-    .payment-tabs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.5rem;
-      background: #f1f5f9;
-      padding: 4px;
-      border-radius: var(--radius-md);
-      margin-bottom: 1.5rem;
-      border: 1px solid var(--border-subtle);
-    }
-
-    .tab-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      padding: 0.65rem;
-      background: transparent;
-      border: none;
-      color: var(--text-secondary);
-      font-size: 0.85rem;
-      font-weight: 600;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .tab-btn.active {
-      background: #ffffff;
-      color: var(--text-primary);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    .form-row {
-      display: flex;
-      gap: 1rem;
-    }
-
-    .form-row .half {
-      flex: 1;
-    }
-
-    .card-input-wrapper {
-      position: relative;
-    }
-
-    .card-chip {
-      position: absolute;
-      right: 0.75rem;
-      top: 50%;
-      transform: translateY(-50%);
-      background: #eef2ff;
-      border: 1px solid #c7d2fe;
-      color: #4f46e5;
-      font-size: 0.65rem;
-      font-weight: 800;
-      padding: 0.2rem 0.5rem;
-      border-radius: var(--radius-sm);
-    }
-
-    .instant-guarantee {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.825rem;
-      color: #065f46;
-      background: #ecfdf5;
-      border: 1px solid #a7f3d0;
-      padding: 0.65rem 0.85rem;
-      border-radius: var(--radius-md);
-      margin-bottom: 1.25rem;
     }
 
     .bank-details-box {
@@ -493,19 +321,13 @@ import { AuthService } from '../../../core/services/auth.service';
       width: 72px;
       height: 72px;
       border-radius: 50%;
-      background: #ecfdf5;
-      border: 2px solid #10b981;
-      color: #059669;
+      background: #fffbeb;
+      border: 2px solid #f59e0b;
+      color: #d97706;
       display: flex;
       align-items: center;
       justify-content: center;
       margin: 0 auto 1.25rem;
-    }
-
-    .success-icon.success-amber {
-      background: #fffbeb;
-      border-color: #f59e0b;
-      color: #d97706;
     }
 
     .success-desc {
@@ -513,23 +335,6 @@ import { AuthService } from '../../../core/services/auth.service';
       max-width: 480px;
       margin: 0.75rem auto 1.5rem;
       font-size: 0.95rem;
-    }
-
-    .invoice-summary {
-      background: #f8fafc;
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 1rem;
-      max-width: 360px;
-      margin: 0 auto 1.5rem;
-      text-align: left;
-    }
-
-    .invoice-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.85rem;
-      padding: 0.25rem 0;
     }
 
     .success-actions {
@@ -547,18 +352,11 @@ export class CheckoutModalComponent {
   paymentService = inject(PaymentService);
   authService = inject(AuthService);
 
-  selectedTab: 'card' | 'bank' = 'card';
   loading = signal(false);
   paymentSuccess = signal(false);
   completedPayment = signal<Payment | null>(null);
 
   bankDetails: BankDetails | null = null;
-
-  // Card form
-  cardHolderName = this.authService.currentUser()?.fullName || '';
-  cardNumber = '';
-  expiry = '';
-  cvc = '';
 
   // Bank form
   bankRef = '';
@@ -583,39 +381,6 @@ export class CheckoutModalComponent {
     if (file) {
       this.slipFile = file;
     }
-  }
-
-  handleInstantCheckout() {
-    const cleanNum = this.cardNumber.replace(/\s+/g, '');
-    if (!this.cardHolderName.trim()) {
-      alert('Please enter the name on the card.');
-      return;
-    }
-    if (cleanNum.length < 15) {
-      alert('Please enter a valid 15 or 16-digit card number.');
-      return;
-    }
-    if (!this.expiry.trim() || !this.cvc.trim()) {
-      alert('Please enter the expiry date and security code.');
-      return;
-    }
-
-    this.loading.set(true);
-    this.paymentService.instantCheckout({
-      courseId: this.course.id,
-      cardHolderName: this.cardHolderName.trim(),
-      cardNumberLast4: cleanNum.slice(-4)
-    }).subscribe({
-      next: (payment) => {
-        this.loading.set(false);
-        this.completedPayment.set(payment);
-        this.paymentSuccess.set(true);
-      },
-      error: (err) => {
-        this.loading.set(false);
-        alert(err.error?.message || 'Checkout failed. Please try again.');
-      }
-    });
   }
 
   handleBankTransferSubmit() {

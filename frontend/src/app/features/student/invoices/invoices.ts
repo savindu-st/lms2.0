@@ -26,7 +26,7 @@ import { SystemService } from '../../../core/services/system.service';
       } @else if (invoices().length === 0) {
         <div class="empty-state card">
           <h3>No payment records found</h3>
-          <p class="text-secondary">When you enroll in courses via card or bank transfer, your official invoices will appear here.</p>
+          <p class="text-secondary">When your bank transfer enrollment is verified, your official invoices will appear here.</p>
         </div>
       } @else {
         <div class="table-responsive">

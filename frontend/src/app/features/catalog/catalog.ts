@@ -22,24 +22,24 @@ import { CheckoutModalComponent } from '../../shared/components/checkout-modal/c
             Official Online Academy &bull; {{ systemService.instructorName() }}
           </div>
           <h1 class="hero-title">
-            Master Corporate <span class="gradient-text">Accounting & Finance</span>
+            Master Accounting & Finance with <span class="gradient-text">Expert-Led Courses</span>
           </h1>
           <p class="hero-subtitle">
-            Structured monthly intensive masterclasses covering financial statement reconciliation, accruals & GAAP, managerial cost budgeting, and audit defense. Built for career acceleration and CPA exam readiness.
+            Structured, career-focused masterclasses covering core accounting principles, financial statement analysis, and practical real-world applications.
           </p>
 
           <div class="hero-features">
             <div class="feat-item">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              <span>New Masterclasses Added Every Month</span>
+              <span>Structured Curriculum & Modular Lessons</span>
             </div>
             <div class="feat-item">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              <span>Time-Limited Focused Access (30-60 Days)</span>
+              <span>Time-Limited Focused Access with Progress Tracking</span>
             </div>
             <div class="feat-item">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              <span>Instant Card or Bank Wire with Verified Receipt</span>
+              <span>Bank Wire Deposit with Verified Receipt & Tax Invoice</span>
             </div>
           </div>
         </div>
@@ -50,8 +50,8 @@ import { CheckoutModalComponent } from '../../shared/components/checkout-modal/c
         <div class="container">
           <div class="catalog-header">
             <div>
-              <h2>Monthly Accounting Courses</h2>
-              <p class="text-secondary">Enroll in this month's cohort or explore past masterclass archives</p>
+              <h2>Available Masterclasses</h2>
+              <p class="text-secondary">Explore current courses and syllabus archives</p>
             </div>
 
             <div class="catalog-filters">

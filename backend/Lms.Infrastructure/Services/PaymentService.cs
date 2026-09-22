@@ -22,41 +22,6 @@ public class PaymentService : IPaymentService
         _configuration = configuration;
     }
 
-    public async Task<PaymentDto> ProcessInstantCheckoutAsync(Guid studentId, InstantCheckoutDto dto)
-    {
-        var student = await _context.Users.FindAsync(studentId);
-        if (student == null) throw new KeyNotFoundException("Student not found.");
-
-        var course = await _context.Courses.FindAsync(dto.CourseId);
-        if (course == null) throw new KeyNotFoundException("Course not found.");
-
-        var transactionRef = $"TXN-INST-{DateTime.UtcNow:yyyyMMddHHmmss}-{new Random().Next(1000, 9999)}";
-
-        var payment = new Payment
-        {
-            StudentId = studentId,
-            CourseId = dto.CourseId,
-            Amount = course.Price,
-            Currency = "USD",
-            Method = PaymentMethod.InstantGateway,
-            Status = PaymentStatus.Completed,
-            TransactionRef = transactionRef,
-            VerifiedAt = DateTime.UtcNow,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        _context.Payments.Add(payment);
-        await _context.SaveChangesAsync();
-
-        // Auto-enroll the student for course.AccessDurationDays
-        await _enrollmentService.EnrollStudentAsync(studentId, dto.CourseId, course.AccessDurationDays);
-
-        // Generate Invoice
-        var invoice = await CreateInvoiceForPaymentAsync(payment, student, course);
-
-        return MapToDto(payment, student, course, invoice);
-    }
-
     public async Task<PaymentDto> SubmitBankTransferAsync(Guid studentId, BankTransferSubmitDto dto)
     {
         var student = await _context.Users.FindAsync(studentId);

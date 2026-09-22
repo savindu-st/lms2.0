@@ -8,11 +8,11 @@
 
 | Component | Architecture / Technology | Port / URL | Status | Last Verified |
 | :--- | :--- | :--- | :--- | :--- |
-| **Edge Gateway** | .NET 8 / YARP 2.1 Reverse Proxy | `:5000` | 🟢 Active | 2026-09-21 |
-| **Backend API** | ASP.NET Core 8 Clean Architecture | `:5001` (Internal) | 🟢 Active | 2026-09-21 |
-| **Frontend SPA** | Angular 22 / Reactive Signals / NGINX | `:4200` | 🟢 Active | 2026-09-21 |
-| **Database** | Supabase PostgreSQL (Cloud Session Pooler) | Pooler `:5432` | 🟢 Clean Slate | 2026-09-21 |
-| **Docker Stack** | Docker Compose (3 Services + Persistent Vol) | Multi-container | 🟢 Verified | 2026-09-21 |
+| **Edge Gateway** | .NET 8 / YARP 2.1 Reverse Proxy | `:5000` | 🟢 Active | 2026-09-22 |
+| **Backend API** | ASP.NET Core 8 Clean Architecture | `:5001` (Internal) | 🟢 Active | 2026-09-22 |
+| **Frontend SPA** | Angular 22 / Reactive Signals / NGINX | `:4200` | 🟢 Active | 2026-09-22 |
+| **Database** | Supabase PostgreSQL (Cloud Session Pooler) | Pooler `:5432` | 🟢 Clean Slate | 2026-09-22 |
+| **Docker Stack** | Docker Compose (3 Services + Persistent Vol) | Multi-container | 🟢 Verified | 2026-09-22 |
 
 ---
 
@@ -60,8 +60,14 @@
 - [x] Enforced strict role security: `/register` only registers Students, and forbids using the reserved teacher email.
 - [x] Created `/api/system/branding` endpoint delivering dynamic `academyName`, `instructorName`, and instructor `bankDetails`.
 - [x] Removed 1-click demo login buttons on `/login`, demo switch pills from Navbar, and `quickLoginAs()` from `AuthService`.
-- [x] Cleaned instant card checkout simulation: removed `'4242'`, `'Alex Reynolds'`, `'TEST VISA'`, and added client validation.
-- [x] Replaced hardcoded "Vance Academy" and "Prof. Marcus Vance" with dynamic branding in Navbar, Catalog, Invoices, My Courses, and Registration.
+- [x] **Completely purged simulated instant credit card checkout**:
+  - Removed fake credit card checkout tab and dummy card inputs from `checkout-modal.ts`.
+  - Removed `POST /api/student/checkout/instant` endpoint from `StudentPortalController.cs`.
+  - Removed `ProcessInstantCheckoutAsync` from `IPaymentService` and `PaymentService.cs`.
+  - Removed `InstantCheckoutDto` and associated mock test from `PaymentServiceTests.cs`.
+  - Converted enrollment checkout exclusively to the genuine Bank Wire & Slip Upload workflow with instructor verification.
+- [x] Purged all remaining legacy demo branding ("Vance Academy", "Prof. Vance", "Alex Reynolds") across `index.html`, `player.ts`, `invoices.ts`, `login.ts`, `my-courses.ts`, `navbar.ts`, and `styles.css`.
+- [x] Standardized hero headline and catalog copy to professional "Master Accounting & Finance with Expert-Led Courses".
 - [x] Verified full stack compiles cleanly (`dotnet build`, `dotnet test`, `npm run build`).
 
 ---
@@ -99,6 +105,7 @@
 
 | Date | Contributor / Agent | Action & Summary | Status |
 | :--- | :--- | :--- | :--- |
+| **2026-09-22** | Agent | Completely purged simulated instant card checkout from frontend & backend, eliminated all legacy demo texts ('Vance', 'Alex Reynolds'), streamlined checkout to exclusive bank wire verification. | Completed |
 | **2026-09-21** | Agent | Completed mock data removal, wiped demo records from Supabase, hardened teacher auth & branding. | Completed |
 | **2026-09-21** | Agent | Added progress.md to .gitignore and untracked from Git cache for quiet local updates. | Completed |
 | **2026-09-21** | Agent | Fixed Mermaid diagram syntax error in README.md (quoted labels containing `/` and `()`). | Completed |

@@ -14,7 +14,7 @@ import { AuthService } from '../../core/services/auth.service';
         <div class="auth-header">
           <span class="badge badge-indigo">Secure Portal Login</span>
           <h2>Welcome Back</h2>
-          <p class="text-secondary">Sign in to your accounting classroom or instructor dashboard.</p>
+          <p class="text-secondary">Sign in to your student classroom or instructor dashboard.</p>
         </div>
 
         @if (errorMessage()) {
@@ -31,7 +31,7 @@ import { AuthService } from '../../core/services/auth.service';
               class="form-control"
               [(ngModel)]="email"
               name="email"
-              placeholder="e.g. alex@example.com"
+              placeholder="e.g. student@example.com"
               required />
           </div>
 

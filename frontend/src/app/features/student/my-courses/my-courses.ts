@@ -15,7 +15,7 @@ import { AuthService } from '../../../core/services/auth.service';
       <div class="dash-header">
         <div>
           <span class="badge badge-emerald">Student Dashboard</span>
-          <h1>My Accounting Classroom</h1>
+          <h1>My Classroom</h1>
           <p class="text-secondary">Track your enrolled courses, time-limited access validity, and pending approvals.</p>
         </div>
 

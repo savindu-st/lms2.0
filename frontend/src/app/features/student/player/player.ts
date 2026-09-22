@@ -260,7 +260,7 @@ import { PaymentService } from '../../../core/services/payment.service';
                           Score: {{ activeLesson()?.assignment?.mySubmission?.score }} / {{ activeLesson()?.assignment?.mySubmission?.maxPoints }}
                         </div>
                         <p *ngIf="activeLesson()?.assignment?.mySubmission?.teacherFeedback" class="grade-feedback">
-                          <strong>Prof. Vance Feedback:</strong> {{ activeLesson()?.assignment?.mySubmission?.teacherFeedback }}
+                          <strong>Instructor Feedback:</strong> {{ activeLesson()?.assignment?.mySubmission?.teacherFeedback }}
                         </p>
                       </div>
                     }
@@ -274,7 +274,7 @@ import { PaymentService } from '../../../core/services/payment.service';
                     <input type="file" (change)="onAssignmentFileSelected($event)" accept=".xlsx,.xls,.pdf,.csv" class="form-control" />
                   </div>
                   <div class="form-group">
-                    <label class="form-label">Notes for Prof. Vance (optional)</label>
+                    <label class="form-label">Notes for Instructor (optional)</label>
                     <textarea [(ngModel)]="assignmentNotes" name="asNotes" class="form-control" rows="2" placeholder="Describe key formulas or assumptions used..."></textarea>
                   </div>
                   <button type="submit" [disabled]="submittingAssignment() || !assignmentFile" class="btn btn-emerald btn-lg">

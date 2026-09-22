@@ -22,7 +22,7 @@ import { SystemService } from '../../../core/services/system.service';
           </div>
           <div class="brand-text">
             <span class="brand-title">{{ systemService.academyName() }}</span>
-            <span class="brand-subtitle">Accounting & Finance</span>
+            <span class="brand-subtitle">Learning Portal</span>
           </div>
         </a>
 
