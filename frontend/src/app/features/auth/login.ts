@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
@@ -51,24 +51,6 @@ import { AuthService } from '../../core/services/auth.service';
           </button>
         </form>
 
-        <!-- Quick 1-Click Demo Logins -->
-        <div class="demo-login-section">
-          <div class="divider">
-            <span>Or test with 1-click demo profiles</span>
-          </div>
-
-          <div class="demo-buttons">
-            <button (click)="demoLogin('teacher')" type="button" class="btn btn-outline demo-role-btn">
-              <span class="badge badge-amber">Instructor</span>
-              <span>Prof. Vance (Teacher)</span>
-            </button>
-            <button (click)="demoLogin('student')" type="button" class="btn btn-outline demo-role-btn">
-              <span class="badge badge-emerald">Student</span>
-              <span>Alex Reynolds (Student)</span>
-            </button>
-          </div>
-        </div>
-
         <div class="auth-footer">
           <span>Don't have an account?</span>
           <a routerLink="/register">Register here</a>
@@ -101,9 +83,9 @@ import { AuthService } from '../../core/services/auth.service';
     }
 
     .error-banner {
-      background: #fff1f2;
-      border: 1px solid #fecdd3;
-      color: #9f1239;
+      background: #fee2e2;
+      border: 1px solid #fecaca;
+      color: #b91c1c;
       padding: 0.75rem 1rem;
       border-radius: var(--radius-md);
       font-size: 0.85rem;
@@ -113,51 +95,6 @@ import { AuthService } from '../../core/services/auth.service';
 
     .w-full {
       width: 100%;
-    }
-
-    .demo-login-section {
-      margin-top: 2rem;
-    }
-
-    .divider {
-      text-align: center;
-      position: relative;
-      margin-bottom: 1.25rem;
-    }
-
-    .divider::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: var(--border-subtle);
-      z-index: 1;
-    }
-
-    .divider span {
-      position: relative;
-      z-index: 2;
-      background: var(--bg-card);
-      padding: 0 0.75rem;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .demo-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 0.65rem;
-    }
-
-    .demo-role-btn {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.75rem 1rem;
     }
 
     .auth-footer {
@@ -174,6 +111,7 @@ import { AuthService } from '../../core/services/auth.service';
 export class LoginComponent {
   authService = inject(AuthService);
   router = inject(Router);
+  route = inject(ActivatedRoute);
 
   email = '';
   password = '';
@@ -187,6 +125,16 @@ export class LoginComponent {
     this.authService.login({ email: this.email, password: this.password }).subscribe({
       next: (res) => {
         this.loading.set(false);
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+        const enrollCourseId = this.route.snapshot.queryParams['enrollCourseId'];
+
+        if (returnUrl) {
+          this.router.navigate([returnUrl], {
+            queryParams: enrollCourseId ? { enroll: enrollCourseId } : {}
+          });
+          return;
+        }
+
         if (res.user.role === 2) {
           this.router.navigate(['/teacher/courses']);
         } else {
@@ -196,25 +144,6 @@ export class LoginComponent {
       error: (err) => {
         this.loading.set(false);
         this.errorMessage.set(err.error?.message || 'Invalid email or password.');
-      }
-    });
-  }
-
-  demoLogin(role: 'teacher' | 'student') {
-    this.loading.set(true);
-    this.errorMessage.set(null);
-    this.authService.quickLoginAs(role).subscribe({
-      next: (res) => {
-        this.loading.set(false);
-        if (res.user.role === 2) {
-          this.router.navigate(['/teacher/courses']);
-        } else {
-          this.router.navigate(['/student/my-courses']);
-        }
-      },
-      error: (err) => {
-        this.loading.set(false);
-        this.errorMessage.set(err.error?.message || 'Demo login failed.');
       }
     });
   }

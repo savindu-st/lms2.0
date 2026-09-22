@@ -109,7 +109,37 @@ Directory.CreateDirectory(Path.Combine(uploadsPath, "slips"));
 Directory.CreateDirectory(Path.Combine(uploadsPath, "materials"));
 Directory.CreateDirectory(Path.Combine(uploadsPath, "submissions"));
 
-// Auto-seed database at startup
+// One-time database table wipe if invoked with --wipe-database
+if (args.Contains("--wipe-database"))
+{
+    using var wipeScope = app.Services.CreateScope();
+    var wipeContext = wipeScope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var wipeLogger = wipeScope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    wipeLogger.LogWarning("Executing database table wipe per --wipe-database flag...");
+    await wipeContext.Database.ExecuteSqlRawAsync(@"
+        TRUNCATE TABLE 
+            ""Invoices"",
+            ""Payments"",
+            ""Enrollments"",
+            ""AssignmentSubmissions"",
+            ""Assignments"",
+            ""QuizAttempts"",
+            ""QuizQuestions"",
+            ""LessonCompletions"",
+            ""Lessons"",
+            ""CourseModules"",
+            ""Courses"",
+            ""Users""
+        CASCADE;
+    ");
+    wipeLogger.LogInformation("All application tables truncated successfully.");
+    var configuration = wipeScope.ServiceProvider.GetRequiredService<IConfiguration>();
+    await DbInitializer.InitializeAsync(wipeContext, configuration);
+    wipeLogger.LogInformation("Database reset and initial teacher account provisioned successfully. Exiting.");
+    return;
+}
+
+// Database initialization and teacher provisioning at startup
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -117,9 +147,10 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<AppDbContext>();
-        logger.LogInformation("Attempting database initialization and seeding...");
-        await DbInitializer.InitializeAsync(context);
-        logger.LogInformation("Database initialized and seeded successfully.");
+        var configuration = services.GetRequiredService<IConfiguration>();
+        logger.LogInformation("Attempting database initialization and teacher provisioning...");
+        await DbInitializer.InitializeAsync(context, configuration);
+        logger.LogInformation("Database initialized successfully.");
     }
     catch (Exception ex)
     {

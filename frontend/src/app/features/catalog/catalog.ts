@@ -1,10 +1,11 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Course, CourseDetail } from '../../core/models/models';
 import { CourseService } from '../../core/services/course.service';
 import { AuthService } from '../../core/services/auth.service';
+import { SystemService } from '../../core/services/system.service';
 import { CheckoutModalComponent } from '../../shared/components/checkout-modal/checkout-modal';
 
 @Component({
@@ -18,7 +19,7 @@ import { CheckoutModalComponent } from '../../shared/components/checkout-modal/c
         <div class="container hero-content">
           <div class="hero-badge">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-            Official Online Academy &bull; Prof. Marcus Vance, CPA
+            Official Online Academy &bull; {{ systemService.instructorName() }}
           </div>
           <h1 class="hero-title">
             Master Corporate <span class="gradient-text">Accounting & Finance</span>
@@ -91,7 +92,16 @@ import { CheckoutModalComponent } from '../../shared/components/checkout-modal/c
             </div>
           } @else if (filteredCourses().length === 0) {
             <div class="empty-state card">
-              <p>No courses match your filter criteria.</p>
+              <h3 *ngIf="courses().length === 0">No courses published yet</h3>
+              <p class="text-secondary" *ngIf="courses().length === 0">
+                Please check back soon for upcoming masterclasses, or log in as an instructor to publish a new course.
+              </p>
+              <p *ngIf="courses().length > 0">No courses match your filter criteria.</p>
+              @if (authService.isTeacher()) {
+                <a routerLink="/teacher/courses" class="btn btn-primary" style="margin-top: 1rem;">
+                  Open Course Studio
+                </a>
+              }
             </div>
           } @else {
             <div class="courses-grid">
@@ -627,7 +637,9 @@ import { CheckoutModalComponent } from '../../shared/components/checkout-modal/c
 export class CatalogComponent {
   courseService = inject(CourseService);
   authService = inject(AuthService);
+  systemService = inject(SystemService);
   router = inject(Router);
+  route = inject(ActivatedRoute);
 
   courses = signal<Course[]>([]);
   loading = signal(true);
@@ -667,6 +679,15 @@ export class CatalogComponent {
       next: (data) => {
         this.courses.set(data);
         this.loading.set(false);
+
+        // Check for return from login with pending enroll course
+        const enrollId = this.route.snapshot.queryParams['enroll'];
+        if (enrollId && this.authService.isLoggedIn()) {
+          const target = data.find(c => c.id === enrollId);
+          if (target && !target.isEnrolled) {
+            this.selectedCheckoutCourse.set(target);
+          }
+        }
       },
       error: (err) => {
         console.error('Failed to load courses', err);
@@ -691,9 +712,8 @@ export class CatalogComponent {
 
   openCheckout(course: Course) {
     if (!this.authService.isLoggedIn()) {
-      // Direct quick login for demo convenience, or navigate to login
-      this.authService.quickLoginAs('student').subscribe(() => {
-        this.selectedCheckoutCourse.set(course);
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: '/', enrollCourseId: course.id }
       });
       return;
     }

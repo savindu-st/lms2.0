@@ -39,7 +39,7 @@ import { AuthService } from '../../../core/services/auth.service';
               You are now officially enrolled in <strong>{{ course.title }}</strong> with <strong>{{ course.accessDurationDays }} days</strong> of access.
             </p>
             <p class="success-desc" *ngIf="completedPayment()?.status === 1">
-              Your bank transfer reference <strong>{{ completedPayment()?.transactionRef }}</strong> and receipt have been submitted to Prof. Vance. You will receive immediate classroom access once approved!
+              Your bank transfer reference <strong>{{ completedPayment()?.transactionRef }}</strong> and receipt have been submitted to the academy instructor. You will receive immediate classroom access once approved!
             </p>
 
             <div class="invoice-summary" *ngIf="completedPayment()?.invoice">
@@ -113,32 +113,33 @@ import { AuthService } from '../../../core/services/auth.service';
                   class="form-control"
                   [(ngModel)]="cardHolderName"
                   name="cardHolder"
-                  placeholder="e.g. Alex Reynolds"
+                  placeholder="Cardholder Full Name"
                   required />
               </div>
 
               <div class="form-group">
-                <label class="form-label">Card Number (Simulation Mode)</label>
+                <label class="form-label">Card Number</label>
                 <div class="card-input-wrapper">
                   <input
                     type="text"
                     class="form-control mono-num"
                     [(ngModel)]="cardNumber"
                     name="cardNumber"
-                    placeholder="4242 &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 4242"
+                    placeholder="1234 5678 9012 3456"
+                    maxlength="19"
                     required />
-                  <span class="card-chip">TEST VISA</span>
+                  <span class="card-chip">CARD</span>
                 </div>
               </div>
 
               <div class="form-row">
                 <div class="form-group half">
                   <label class="form-label">Expiry</label>
-                  <input type="text" class="form-control mono-num" [(ngModel)]="expiry" name="expiry" placeholder="MM/YY" />
+                  <input type="text" class="form-control mono-num" [(ngModel)]="expiry" name="expiry" placeholder="MM/YY" maxlength="5" required />
                 </div>
                 <div class="form-group half">
                   <label class="form-label">CVC</label>
-                  <input type="text" class="form-control mono-num" [(ngModel)]="cvc" name="cvc" placeholder="CVC" />
+                  <input type="text" class="form-control mono-num" [(ngModel)]="cvc" name="cvc" placeholder="CVC" maxlength="4" required />
                 </div>
               </div>
 
@@ -147,7 +148,7 @@ import { AuthService } from '../../../core/services/auth.service';
                 <span>Instant activation: Gain classroom access immediately upon clicking Pay.</span>
               </div>
 
-              <button type="submit" [disabled]="loading()" class="btn btn-emerald btn-lg w-full">
+              <button type="submit" [disabled]="loading() || !cardHolderName || !cardNumber || !expiry || !cvc" class="btn btn-emerald btn-lg w-full">
                 @if (loading()) {
                   <span>Processing...</span>
                 } @else {
@@ -163,25 +164,32 @@ import { AuthService } from '../../../core/services/auth.service';
               <!-- Bank details display -->
               <div class="bank-details-box">
                 <h4>Official Instructor Bank Details</h4>
-                <div class="bank-grid">
-                  <div class="bank-item">
-                    <span class="label">Bank Name:</span>
-                    <span class="val">{{ bankDetails?.bankName || 'Bank of Accounting & Finance' }}</span>
+                @if (bankDetails?.accountNumber) {
+                  <div class="bank-grid">
+                    <div class="bank-item" *ngIf="bankDetails?.bankName">
+                      <span class="label">Bank Name:</span>
+                      <span class="val">{{ bankDetails?.bankName }}</span>
+                    </div>
+                    <div class="bank-item" *ngIf="bankDetails?.accountHolder">
+                      <span class="label">Beneficiary Name:</span>
+                      <span class="val">{{ bankDetails?.accountHolder }}</span>
+                    </div>
+                    <div class="bank-item">
+                      <span class="label">Account Number:</span>
+                      <span class="val mono-num">{{ bankDetails?.accountNumber }}</span>
+                    </div>
+                    <div class="bank-item" *ngIf="bankDetails?.routingOrSwift">
+                      <span class="label">SWIFT / Routing:</span>
+                      <span class="val mono-num">{{ bankDetails?.routingOrSwift }}</span>
+                    </div>
                   </div>
-                  <div class="bank-item">
-                    <span class="label">Beneficiary Name:</span>
-                    <span class="val">{{ bankDetails?.accountHolder || 'Prof. Marcus Vance, CPA' }}</span>
-                  </div>
-                  <div class="bank-item">
-                    <span class="label">Account Number:</span>
-                    <span class="val mono-num">{{ bankDetails?.accountNumber || '9820-4100-8841-2900' }}</span>
-                  </div>
-                  <div class="bank-item">
-                    <span class="label">SWIFT / Routing:</span>
-                    <span class="val mono-num">{{ bankDetails?.routingOrSwift || 'BAFUS33XX' }}</span>
-                  </div>
-                </div>
-                <p class="bank-note">{{ bankDetails?.transferInstructions }}</p>
+                  <p class="bank-note" *ngIf="bankDetails?.transferInstructions">{{ bankDetails?.transferInstructions }}</p>
+                } @else {
+                  <p class="text-secondary" style="font-size: 0.85rem; margin-bottom: 0.5rem;">
+                    {{ bankDetails?.transferInstructions || 'Please contact your instructor or academy administration to obtain direct wire coordinates.' }}
+                  </p>
+                  <p class="bank-note">Once you complete the deposit at your bank, upload your transfer receipt or slip below to request immediate enrollment verification.</p>
+                }
               </div>
 
               <form (ngSubmit)="handleBankTransferSubmit()" class="checkout-form">
@@ -547,10 +555,10 @@ export class CheckoutModalComponent {
   bankDetails: BankDetails | null = null;
 
   // Card form
-  cardHolderName = this.authService.currentUser()?.fullName || 'Alex Reynolds';
-  cardNumber = '4242 •••• •••• 4242';
-  expiry = '12/28';
-  cvc = '889';
+  cardHolderName = this.authService.currentUser()?.fullName || '';
+  cardNumber = '';
+  expiry = '';
+  cvc = '';
 
   // Bank form
   bankRef = '';
@@ -578,11 +586,25 @@ export class CheckoutModalComponent {
   }
 
   handleInstantCheckout() {
+    const cleanNum = this.cardNumber.replace(/\s+/g, '');
+    if (!this.cardHolderName.trim()) {
+      alert('Please enter the name on the card.');
+      return;
+    }
+    if (cleanNum.length < 15) {
+      alert('Please enter a valid 15 or 16-digit card number.');
+      return;
+    }
+    if (!this.expiry.trim() || !this.cvc.trim()) {
+      alert('Please enter the expiry date and security code.');
+      return;
+    }
+
     this.loading.set(true);
     this.paymentService.instantCheckout({
       courseId: this.course.id,
-      cardHolderName: this.cardHolderName,
-      cardNumberLast4: '4242'
+      cardHolderName: this.cardHolderName.trim(),
+      cardNumberLast4: cleanNum.slice(-4)
     }).subscribe({
       next: (payment) => {
         this.loading.set(false);

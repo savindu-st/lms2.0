@@ -71,3 +71,5 @@ Thumbs.db
 *.bak
 *.swp
 *~
+# Local Agent Progress Tracker
+progress.md

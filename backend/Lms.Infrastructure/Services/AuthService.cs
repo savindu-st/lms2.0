@@ -6,22 +6,33 @@ using Lms.Core.Interfaces;
 using Lms.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
+using Microsoft.Extensions.Configuration;
+
 namespace Lms.Infrastructure.Services;
 
 public class AuthService : IAuthService
 {
     private readonly AppDbContext _context;
     private readonly ITokenService _tokenService;
+    private readonly IConfiguration? _configuration;
 
-    public AuthService(AppDbContext context, ITokenService tokenService)
+    public AuthService(AppDbContext context, ITokenService tokenService, IConfiguration? configuration = null)
     {
         _context = context;
         _tokenService = tokenService;
+        _configuration = configuration;
     }
 
     public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto)
     {
         var normalizedEmail = dto.Email.Trim().ToLowerInvariant();
+
+        var teacherEmail = _configuration?["Teacher:Email"] ?? _configuration?["TEACHER_EMAIL"];
+        if (!string.IsNullOrWhiteSpace(teacherEmail) && normalizedEmail == teacherEmail.Trim().ToLowerInvariant())
+        {
+            throw new InvalidOperationException("This email is reserved for the academy instructor account. Instructors cannot register via this form.");
+        }
+
         var existing = await _context.Users.AnyAsync(u => u.Email.ToLower() == normalizedEmail);
         if (existing)
         {

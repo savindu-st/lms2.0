@@ -3,17 +3,6 @@ using Lms.Core.Enums;
 
 namespace Lms.Core.DTOs;
 
-public class InstantCheckoutDto
-{
-    [Required]
-    public Guid CourseId { get; set; }
-
-    [Required]
-    public string CardHolderName { get; set; } = string.Empty;
-
-    public string? CardNumberLast4 { get; set; }
-}
-
 public class BankTransferSubmitDto
 {
     [Required]
@@ -79,12 +68,13 @@ public class InvoiceDto
 
 public class BankDetailsDto
 {
-    public string BankName { get; set; } = "Bank of Accounting & Finance";
-    public string AccountHolder { get; set; } = "Prof. Marcus Vance, CPA";
-    public string AccountNumber { get; set; } = "9820-4100-8841-2900";
-    public string RoutingOrSwift { get; set; } = "BAFUS33XX";
-    public string BranchName { get; set; } = "Financial District Branch";
-    public string TransferInstructions { get; set; } = "Please include your Student Name and Course Code in the payment reference. Upload a photo or PDF of your transfer receipt/slip after sending.";
+    public string BankName { get; set; } = string.Empty;
+    public string AccountHolder { get; set; } = string.Empty;
+    public string AccountNumber { get; set; } = string.Empty;
+    public string RoutingOrSwift { get; set; } = string.Empty;
+    public string BranchName { get; set; } = string.Empty;
+    public string TransferInstructions { get; set; } = string.Empty;
+    public bool IsConfigured => !string.IsNullOrWhiteSpace(AccountNumber);
 }
 
 public class TeacherAnalyticsDto

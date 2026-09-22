@@ -34,7 +34,7 @@ import { AuthService } from '../../../core/services/auth.service';
           <div class="alert-content">
             <h4>Bank Transfer Verification in Progress</h4>
             <p class="text-secondary">
-              You have submitted {{ pendingPayments().length }} transfer slip(s). Prof. Vance reviews and approves payments regularly.
+              You have submitted {{ pendingPayments().length }} transfer slip(s). The academy instructor reviews and approves payments regularly.
             </p>
             <div class="pending-slips-list">
               @for (pay of pendingPayments(); track pay.id) {

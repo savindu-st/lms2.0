@@ -11,7 +11,7 @@
 | **Edge Gateway** | .NET 8 / YARP 2.1 Reverse Proxy | `:5000` | 🟢 Active | 2026-09-21 |
 | **Backend API** | ASP.NET Core 8 Clean Architecture | `:5001` (Internal) | 🟢 Active | 2026-09-21 |
 | **Frontend SPA** | Angular 22 / Reactive Signals / NGINX | `:4200` | 🟢 Active | 2026-09-21 |
-| **Database** | Supabase PostgreSQL (Cloud Session Pooler) | Pooler `:5432` | 🟢 Connected | 2026-09-21 |
+| **Database** | Supabase PostgreSQL (Cloud Session Pooler) | Pooler `:5432` | 🟢 Clean Slate | 2026-09-21 |
 | **Docker Stack** | Docker Compose (3 Services + Persistent Vol) | Multi-container | 🟢 Verified | 2026-09-21 |
 
 ---
@@ -37,7 +37,7 @@
 ### 3. Cloud Database Integration (Supabase)
 - [x] Successfully connected backend to cloud Supabase PostgreSQL instance via session pooler (`aws-0-ap-south-1.pooler.supabase.com:5432`).
 - [x] Updated `DbInitializer.cs` to dynamically create missing tables using `IRelationalDatabaseCreator.CreateTablesAsync()` in pre-existing databases.
-- [x] Auto-seeded demo accounting courses and starter teacher/student accounts on startup.
+- [x] Connected to Supabase with SSL require and verified query execution.
 
 ### 4. Full-Stack Dockerization
 - [x] Created `backend/Dockerfile.api` (multi-stage .NET 8 Alpine build).
@@ -52,6 +52,17 @@
 - [x] Added comprehensive project root `README.md` with system architecture diagrams, getting started steps, and credentials.
 - [x] Hardened `.gitignore` to prevent leaking `.env`, Supabase passwords, binaries (`bin/`, `obj/`), or user uploads.
 - [x] Created `.agents/rules/git-workflow.md` and `AGENTS.md` enforcing strict non-autonomous commit policy.
+
+### 6. Mock Data Purge & Production Hardening
+- [x] Completely removed synthetic courses, demo students, and fake payments from `DbInitializer.cs`.
+- [x] Created `wipe_and_reset_database.sql` and `wipe_database.sh` to purge all pre-existing demo records in Supabase PostgreSQL via `TRUNCATE TABLE ... CASCADE`.
+- [x] Replaced hardcoded teacher initialization with `.env` provisioning (`TEACHER_EMAIL`, `TEACHER_PASSWORD`, `TEACHER_FULL_NAME`) with startup password synchronization.
+- [x] Enforced strict role security: `/register` only registers Students, and forbids using the reserved teacher email.
+- [x] Created `/api/system/branding` endpoint delivering dynamic `academyName`, `instructorName`, and instructor `bankDetails`.
+- [x] Removed 1-click demo login buttons on `/login`, demo switch pills from Navbar, and `quickLoginAs()` from `AuthService`.
+- [x] Cleaned instant card checkout simulation: removed `'4242'`, `'Alex Reynolds'`, `'TEST VISA'`, and added client validation.
+- [x] Replaced hardcoded "Vance Academy" and "Prof. Marcus Vance" with dynamic branding in Navbar, Catalog, Invoices, My Courses, and Registration.
+- [x] Verified full stack compiles cleanly (`dotnet build`, `dotnet test`, `npm run build`).
 
 ---
 
@@ -88,6 +99,9 @@
 
 | Date | Contributor / Agent | Action & Summary | Status |
 | :--- | :--- | :--- | :--- |
+| **2026-09-21** | Agent | Completed mock data removal, wiped demo records from Supabase, hardened teacher auth & branding. | Completed |
+| **2026-09-21** | Agent | Added progress.md to .gitignore and untracked from Git cache for quiet local updates. | Completed |
+| **2026-09-21** | Agent | Fixed Mermaid diagram syntax error in README.md (quoted labels containing `/` and `()`). | Completed |
 | **2026-09-21** | Agent | Initialized `progress.md` tracker and documented full system architecture state. | Completed |
 | **2026-09-21** | Agent | Added agent rules (`.agents/rules/git-workflow.md` & `AGENTS.md`) prohibiting autonomous commits. | Completed |
 | **2026-09-21** | Agent | Added root `README.md` and committed initial full-stack implementation to GitHub. | Completed |

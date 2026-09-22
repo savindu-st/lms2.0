@@ -43,7 +43,6 @@ public interface IEnrollmentService
 
 public interface IPaymentService
 {
-    Task<PaymentDto> ProcessInstantCheckoutAsync(Guid studentId, InstantCheckoutDto dto);
     Task<PaymentDto> SubmitBankTransferAsync(Guid studentId, BankTransferSubmitDto dto);
     Task<List<PaymentDto>> GetPendingBankTransfersAsync();
     Task<PaymentDto?> VerifyBankTransferAsync(Guid paymentId, PaymentVerificationDto dto);

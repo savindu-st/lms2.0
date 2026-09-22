@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { SystemService } from '../../core/services/system.service';
 
 @Component({
   selector: 'app-register',
@@ -14,7 +15,7 @@ import { AuthService } from '../../core/services/auth.service';
         <div class="auth-header">
           <span class="badge badge-emerald">New Student Enrollment</span>
           <h2>Create Your Account</h2>
-          <p class="text-secondary">Join Vance Academy to enroll in monthly courses and access classroom materials.</p>
+          <p class="text-secondary">Join {{ systemService.academyName() }} to enroll in monthly courses and access classroom materials.</p>
         </div>
 
         @if (errorMessage()) {
@@ -31,7 +32,7 @@ import { AuthService } from '../../core/services/auth.service';
               class="form-control"
               [(ngModel)]="fullName"
               name="fullName"
-              placeholder="e.g. Alex Reynolds"
+              placeholder="e.g. Jane Doe"
               required />
           </div>
 
@@ -42,7 +43,7 @@ import { AuthService } from '../../core/services/auth.service';
               class="form-control"
               [(ngModel)]="email"
               name="email"
-              placeholder="e.g. alex@example.com"
+              placeholder="e.g. jane@example.com"
               required />
           </div>
 
@@ -132,6 +133,7 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class RegisterComponent {
   authService = inject(AuthService);
+  systemService = inject(SystemService);
   router = inject(Router);
 
   fullName = '';

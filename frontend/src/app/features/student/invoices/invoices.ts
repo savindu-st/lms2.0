@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Invoice } from '../../../core/models/models';
 import { PaymentService } from '../../../core/services/payment.service';
+import { SystemService } from '../../../core/services/system.service';
 
 @Component({
   selector: 'app-student-invoices',
@@ -75,9 +76,9 @@ import { PaymentService } from '../../../core/services/payment.service';
             <div class="invoice-sheet" id="printable-invoice">
               <div class="invoice-top">
                 <div class="inst-brand">
-                  <h2>VANCE ACADEMY</h2>
+                  <h2>{{ systemService.academyName() }}</h2>
                   <span>Professional School of Accountancy</span>
-                  <p class="inst-sub">Financial District, New York, NY &bull; Tax ID: 98-4421099</p>
+                  <p class="inst-sub">Official Academic Receipt &bull; Instructor: {{ systemService.instructorName() }}</p>
                 </div>
                 <div class="inv-meta">
                   <div class="inv-title-tag">TAX INVOICE</div>
@@ -376,6 +377,7 @@ import { PaymentService } from '../../../core/services/payment.service';
 })
 export class StudentInvoicesComponent {
   paymentService = inject(PaymentService);
+  systemService = inject(SystemService);
 
   invoices = signal<Invoice[]>([]);
   activeInvoice = signal<Invoice | null>(null);

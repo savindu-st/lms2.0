@@ -56,20 +56,6 @@ export class AuthService {
     this.userSignal.set(null);
   }
 
-  quickLoginAs(role: 'teacher' | 'student'): Observable<AuthResponse> {
-    if (role === 'teacher') {
-      return this.login({
-        email: 'teacher@accountingacademy.com',
-        password: 'Teacher@123'
-      });
-    } else {
-      return this.login({
-        email: 'student@accountingacademy.com',
-        password: 'Student@123'
-      });
-    }
-  }
-
   private handleAuthSuccess(res: AuthResponse): void {
     localStorage.setItem('lms_token', res.token);
     localStorage.setItem('lms_user', JSON.stringify(res.user));

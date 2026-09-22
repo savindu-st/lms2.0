@@ -11,6 +11,17 @@ services:
       - Jwt__SecretKey=${JWT_SECRET_KEY}
       - Jwt__Issuer=${JWT_ISSUER}
       - Jwt__Audience=${JWT_AUDIENCE}
+      - Academy__Name=${ACADEMY_NAME}
+      - Teacher__Email=${TEACHER_EMAIL}
+      - Teacher__Password=${TEACHER_PASSWORD}
+      - Teacher__FullName=${TEACHER_FULL_NAME}
+      - Teacher__Title=${TEACHER_TITLE}
+      - BankDetails__BankName=${BANK_NAME}
+      - BankDetails__AccountHolder=${BANK_ACCOUNT_HOLDER}
+      - BankDetails__AccountNumber=${BANK_ACCOUNT_NUMBER}
+      - BankDetails__RoutingOrSwift=${BANK_ROUTING_OR_SWIFT}
+      - BankDetails__BranchName=${BANK_BRANCH_NAME}
+      - BankDetails__TransferInstructions=${BANK_INSTRUCTIONS}
     volumes:
       - lms_uploads:/app/wwwroot/uploads
     networks:

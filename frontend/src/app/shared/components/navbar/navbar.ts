@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { SystemService } from '../../../core/services/system.service';
 
 @Component({
   selector: 'app-navbar',
@@ -20,7 +21,7 @@ import { AuthService } from '../../../core/services/auth.service';
             </svg>
           </div>
           <div class="brand-text">
-            <span class="brand-title">Vance Academy</span>
+            <span class="brand-title">{{ systemService.academyName() }}</span>
             <span class="brand-subtitle">Accounting & Finance</span>
           </div>
         </a>
@@ -45,7 +46,7 @@ import { AuthService } from '../../../core/services/auth.service';
                 Course Studio
               </a>
               <a routerLink="/teacher/payments" routerLinkActive="active" class="nav-link">
-                Verification Desk
+                Bank Verification
               </a>
               <a routerLink="/teacher/students" routerLinkActive="active" class="nav-link">
                 Student Roster
@@ -58,22 +59,6 @@ import { AuthService } from '../../../core/services/auth.service';
         </div>
 
         <div class="nav-actions">
-          <!-- Demo quick switch pills -->
-          <div class="demo-pills" title="Quick demo switch">
-            <button
-              (click)="quickSwitch('student')"
-              class="demo-btn"
-              [class.active-role]="authService.isLoggedIn() && authService.isStudent()">
-              Demo Student
-            </button>
-            <button
-              (click)="quickSwitch('teacher')"
-              class="demo-btn"
-              [class.active-role]="authService.isLoggedIn() && authService.isTeacher()">
-              Demo Teacher
-            </button>
-          </div>
-
           @if (authService.isLoggedIn()) {
             <div class="user-menu">
               <div class="user-info">
@@ -102,41 +87,39 @@ import { AuthService } from '../../../core/services/auth.service';
   `,
   styles: [`
     .navbar {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(12px);
+      height: 72px;
+      background: var(--bg-card);
       border-bottom: 1px solid var(--border-subtle);
       position: sticky;
       top: 0;
       z-index: 100;
-      height: 72px;
-      display: flex;
-      align-items: center;
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
     }
 
     .nav-container {
+      height: 100%;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 1.5rem;
     }
 
     .nav-brand {
       display: flex;
       align-items: center;
-      gap: 0.85rem;
+      gap: 0.75rem;
       text-decoration: none;
+      color: inherit;
     }
 
     .brand-icon {
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
       border-radius: var(--radius-md);
-      background: linear-gradient(135deg, #4f46e5 0%, #10b981 100%);
+      background: linear-gradient(135deg, #4f46e5 0%, #0284c7 100%);
+      color: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #ffffff;
       box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25);
     }
 
@@ -146,18 +129,18 @@ import { AuthService } from '../../../core/services/auth.service';
     }
 
     .brand-title {
+      font-size: 1.05rem;
       font-weight: 800;
-      font-size: 1.15rem;
-      color: var(--text-primary);
       letter-spacing: -0.02em;
+      color: var(--text-primary);
     }
 
     .brand-subtitle {
-      font-size: 0.72rem;
-      font-weight: 700;
+      font-size: 0.7rem;
+      font-weight: 600;
       color: var(--text-muted);
-      letter-spacing: 0.05em;
       text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
     .nav-links {
@@ -167,13 +150,13 @@ import { AuthService } from '../../../core/services/auth.service';
     }
 
     .nav-link {
-      padding: 0.5rem 0.9rem;
-      font-size: 0.9rem;
+      padding: 0.5rem 0.85rem;
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
       font-weight: 600;
       color: var(--text-secondary);
-      border-radius: var(--radius-sm);
-      transition: var(--transition);
       text-decoration: none;
+      transition: var(--transition);
     }
 
     .nav-link:hover {
@@ -190,37 +173,6 @@ import { AuthService } from '../../../core/services/auth.service';
       display: flex;
       align-items: center;
       gap: 1.25rem;
-    }
-
-    .demo-pills {
-      display: flex;
-      align-items: center;
-      background: #f1f5f9;
-      padding: 3px;
-      border-radius: var(--radius-full);
-      border: 1px solid var(--border-subtle);
-    }
-
-    .demo-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-secondary);
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 0.35rem 0.75rem;
-      border-radius: var(--radius-full);
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .demo-btn:hover {
-      color: var(--text-primary);
-    }
-
-    .demo-btn.active-role {
-      background: #ffffff;
-      color: #0284c7;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
     }
 
     .user-menu {
@@ -242,27 +194,32 @@ import { AuthService } from '../../../core/services/auth.service';
     }
 
     .role-badge {
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.04em;
       color: #059669;
+      background: #ecfdf5;
+      padding: 1px 6px;
+      border-radius: var(--radius-sm);
     }
 
     .role-badge.badge-teacher {
       color: #d97706;
+      background: #fffbeb;
     }
 
     .btn-logout {
-      background: #ffffff;
+      background: #f1f5f9;
       border: 1px solid var(--border-subtle);
       color: var(--text-secondary);
-      border-radius: var(--radius-sm);
-      padding: 0.45rem;
-      cursor: pointer;
+      border-radius: var(--radius-md);
+      width: 36px;
+      height: 36px;
       display: flex;
       align-items: center;
       justify-content: center;
+      cursor: pointer;
       transition: var(--transition);
     }
 
@@ -281,20 +238,8 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class NavbarComponent {
   authService = inject(AuthService);
+  systemService = inject(SystemService);
   router = inject(Router);
-
-  quickSwitch(role: 'student' | 'teacher') {
-    this.authService.quickLoginAs(role).subscribe({
-      next: () => {
-        if (role === 'teacher') {
-          this.router.navigate(['/teacher/courses']);
-        } else {
-          this.router.navigate(['/student/my-courses']);
-        }
-      },
-      error: (err) => console.error('Quick login failed', err)
-    });
-  }
 
   logout() {
     this.authService.logout();
