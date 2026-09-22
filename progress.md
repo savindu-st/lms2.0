@@ -50,6 +50,7 @@
 
 ### 5. Documentation & Repository Security
 - [x] Added comprehensive project root `README.md` with system architecture diagrams, getting started steps, and credentials.
+- [x] Created comprehensive Architecture Decision Records in `ARCHITECTURE_DECISIONS.md` documenting ADR-001 through ADR-010.
 - [x] Hardened `.gitignore` to prevent leaking `.env`, Supabase passwords, binaries (`bin/`, `obj/`), or user uploads.
 - [x] Created `.agents/rules/git-workflow.md` and `AGENTS.md` enforcing strict non-autonomous commit policy.
 
@@ -140,6 +141,10 @@
 
 | Date | Contributor / Agent | Action & Summary | Status |
 | :--- | :--- | :--- | :--- |
+| **2026-09-22** | Agent | Resolved Blocker CR-02: Unblocked Swagger UI and pure Bearer API clients from CSRF middleware in Gateway. Updated `CsrfMiddleware.cs` to only enforce Double-Submit token verification when the ambient `lms_session` cookie is present, referenced `Lms.Gateway` in `Lms.Tests`, added unit tests in `CsrfMiddlewareTests.cs` (22/22 tests passing), and verified clean solution build. | Completed |
+| **2026-09-22** | Agent | Resolved Blocker CR-01: Fixed cross-origin Anti-CSRF token suppression in Angular frontend. Implemented manual `XSRF-TOKEN` cookie extraction and `X-XSRF-TOKEN` header attachment on mutating requests in `auth.interceptor.ts`, cleaned up `app.config.ts`, added comprehensive Vitest unit test suite (12 tests passing), and verified clean production build. | Completed |
+| **2026-09-22** | Agent | Completed 5-Axis Code Review across Correctness, Readability, Architecture, Security, and Testability. Created `CODE_REVIEW_FINDINGS.md` detailing 2 Blockers, 3 Warnings, and 3 Suggestions with remediation diffs. | Completed |
+| **2026-09-22** | Agent | Created `ARCHITECTURE_DECISIONS.md` documenting 10 key Architecture Decision Records (ADRs) covering Clean Architecture, YARP gateway, BFF pattern, token rotation, Supabase PostgreSQL, bank transfer verification, Angular 22 signals, anti-CSRF, file storage, and Docker multi-stage isolation. | Completed |
 | **2026-09-22** | Agent | Completed Milestone 8: Enterprise BFF Pattern with HttpOnly encrypted session cookies, 15m/7d refresh token rotation with 30s grace period, YARP gateway token injection & deduplication, Double-Submit Anti-CSRF protection, and Angular APP_INITIALIZER session bootstrapping. | Completed |
 | **2026-09-22** | Agent | Removed top-of-page topic badges with bullet points throughout the frontend (`login.ts`, `register.ts`, `my-courses.ts`, `invoices.ts`, `bank-verification.ts`, `gradebook.ts`, `student-roster.ts`), verified clean build and unit tests, and updated Docker frontend image. | Completed |
 | **2026-09-22** | Agent | Removed homepage header pill badge ('Official Online Academy • Academy Instructor'), disabled build-time font inlining in `angular.json` for resilient offline compilation, rebuilt and deployed Docker frontend. | Completed |

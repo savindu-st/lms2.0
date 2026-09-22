@@ -73,3 +73,5 @@ Thumbs.db
 *~
 # Local Agent Progress Tracker
 progress.md
+ARCHITECTURE_DECISIONS.md
+CODE_REVIEW_FINDINGS.md

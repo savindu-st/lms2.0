@@ -24,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Lms.Core\Lms.Core.csproj" />
     <ProjectReference Include="..\Lms.Infrastructure\Lms.Infrastructure.csproj" />
+    <ProjectReference Include="..\Lms.Gateway\Lms.Gateway.csproj" />
   </ItemGroup>
 
 </Project>
