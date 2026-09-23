@@ -1,6 +1,6 @@
 # Project Progress & Roadmap Tracker 📈
 
-> **Notice for Agents:** This file tracks ongoing project milestones, completed features, and architectural state. **Agents must automatically update this file** whenever a milestone, major task, feature, or architectural change is completed or initiated.
+> **Notice for Agents:** This file tracks ongoing project milestones, completed features, architectural state, and code review findings. **Agents must automatically update this file** whenever a milestone, major task, architectural decision, code review remediation, or bug fix is completed or initiated. Keep all 5 core sections synchronized: (1) System Health Matrix, (2) ADR Registry, (3) 5-Axis Code Review Status, (4) Milestones & Backlog, and (5) Activity Log.
 
 ---
 
@@ -8,11 +8,47 @@
 
 | Component | Architecture / Technology | Port / URL | Status | Last Verified |
 | :--- | :--- | :--- | :--- | :--- |
-| **Edge Gateway** | .NET 8 / YARP 2.1 Reverse Proxy | `:5000` | 🟢 Active | 2026-09-22 |
-| **Backend API** | ASP.NET Core 8 Clean Architecture | `:5001` (Internal) | 🟢 Active | 2026-09-22 |
-| **Frontend SPA** | Angular 22 / Reactive Signals / NGINX | `:4200` | 🟢 Active | 2026-09-22 |
+| **Edge Gateway** | .NET 8 / YARP 2.1 Reverse Proxy | `:5000` | 🟢 Active (BFF Session & Anti-CSRF Verified) | 2026-09-22 |
+| **Backend API** | ASP.NET Core 8 Clean Architecture | `:5001` (Internal) | 🟢 Active (22 Unit Tests Passing) | 2026-09-22 |
+| **Frontend SPA** | Angular 22 / Reactive Signals / NGINX | `:4200` | 🟢 Active (12 Unit Tests Passing) | 2026-09-22 |
 | **Database** | Supabase PostgreSQL (Cloud Session Pooler) | Pooler `:5432` | 🟢 Clean Slate | 2026-09-22 |
 | **Docker Stack** | Docker Compose (3 Services + Persistent Vol) | Multi-container | 🟢 Verified | 2026-09-22 |
+
+---
+
+## 🏛️ Architecture Decision Records (ADR) Registry
+
+Full documentation of architectural rationale, trade-offs, and consequences is maintained in [`ARCHITECTURE_DECISIONS.md`](file:///home/savindust/Documents/projects/lms%202.0/ARCHITECTURE_DECISIONS.md).
+
+| ADR ID | Decision Title | Status | Date | Scope / Layer |
+| :--- | :--- | :---: | :---: | :--- |
+| **[ADR-001](file:///home/savindust/Documents/projects/lms%202.0/ARCHITECTURE_DECISIONS.md#adr-001-clean-architecture-ports-and-adapters-for-backend)** | Clean Architecture (Ports & Adapters) for Backend | 🟢 Accepted | 2026-09-21 | Backend Core (`Lms.Core`, `Lms.Infrastructure`) |
+| **[ADR-002](file:///home/savindust/Documents/projects/lms%202.0/ARCHITECTURE_DECISIONS.md#adr-002-dedicated-yarp-edge-api-gateway-topology)** | Dedicated YARP Edge API Gateway Topology | 🟢 Accepted | 2026-09-21 | Gateway / Reverse Proxy (`:5000` ➔ `:5001`) |
+| **[ADR-003](file:///home/savindust/Documents/projects/lms%202.0/ARCHITECTURE_DECISIONS.md#adr-003-backend-for-frontend-bff-pattern-with-encrypted-httponly-cookies)** | Backend-For-Frontend (BFF) Pattern with Encrypted Cookies | 🟢 Accepted | 2026-09-22 | Security / Session Management (`lms_session`) |
+| **[ADR-004](file:///home/savindust/Documents/projects/lms%202.0/ARCHITECTURE_DECISIONS.md#adr-004-jwt-token-lifecycle-with-sliding-refresh-and-compromise-detection)** | JWT Token Lifecycle with Sliding Refresh & Grace Period | 🟢 Accepted | 2026-09-22 | Auth / Security (15m JWT, 7d Refresh, 30s Grace) |
+| **[ADR-005](file:///home/savindust/Documents/projects/lms%202.0/ARCHITECTURE_DECISIONS.md#adr-005-supabase-postgresql-cloud-database-with-session-pooling)** | Supabase PostgreSQL Cloud Database & Session Pooling | 🟢 Accepted | 2026-09-21 | Data Layer (Cloud PostgreSQL `:5432` Session Pooler) |
+| **[ADR-006](file:///home/savindust/Documents/projects/lms%202.0/ARCHITECTURE_DECISIONS.md#adr-006-verified-bank-transfer-workflow-and-zero-mock-data-policy)** | Verified Bank Transfer Workflow & Zero Mock Data Policy | 🟢 Accepted | 2026-09-21 | Business Domain (Genuine Wire Slips & Review Desk) |
+| **[ADR-007](file:///home/savindust/Documents/projects/lms%202.0/ARCHITECTURE_DECISIONS.md#adr-007-angular-22-standalone-components-with-reactive-signals)** | Angular 22 Standalone Components with Reactive Signals | 🟢 Accepted | 2026-09-21 | Frontend UI / State (`signal()`, `computed()`) |
+| **[ADR-008](file:///home/savindust/Documents/projects/lms%202.0/ARCHITECTURE_DECISIONS.md#adr-008-perimeter-rate-limiting-and-double-submit-anti-csrf)** | Perimeter Rate Limiting & Double-Submit Anti-CSRF | 🟢 Accepted | 2026-09-22 | Gateway / Security (Tiered RL & Double-Submit CSRF) |
+| **[ADR-009](file:///home/savindust/Documents/projects/lms%202.0/ARCHITECTURE_DECISIONS.md#adr-009-pluggable-file-storage-abstraction-and-persistent-volumes)** | Pluggable File Storage Abstraction & Persistent Volumes | 🟢 Accepted | 2026-09-21 | Storage / Infra (`IFileStorageService`, Docker Volume) |
+| **[ADR-010](file:///home/savindust/Documents/projects/lms%202.0/ARCHITECTURE_DECISIONS.md#adr-010-multi-stage-docker-containerization-and-network-isolation)** | Multi-Stage Docker Containerization & Network Isolation | 🟢 Accepted | 2026-09-21 | DevOps (`docker-compose`, Alpine Images, Bridge Network) |
+
+---
+
+## 🛡️ 5-Axis Code Review & Remediation Status
+
+Actionable findings and technical debt tracking from the formal 5-axis code review are documented in [`CODE_REVIEW_FINDINGS.md`](file:///home/savindust/Documents/projects/lms%202.0/CODE_REVIEW_FINDINGS.md).
+
+| Finding ID | Severity | Category | Description | Status | Target |
+| :--- | :---: | :--- | :--- | :---: | :--- |
+| **[CR-01](file:///home/savindust/Documents/projects/lms%202.0/CODE_REVIEW_FINDINGS.md#cr-01-angular-cross-origin-anti-csrf-token-suppression)** | 🔴 `BLOCKER` | Correctness / Security | Angular HttpClient suppresses `X-XSRF-TOKEN` on cross-origin requests (`localhost:4200` ➔ `localhost:5000`) | 🟢 Resolved | Frontend `auth.interceptor.ts` |
+| **[CR-02](file:///home/savindust/Documents/projects/lms%202.0/CODE_REVIEW_FINDINGS.md#cr-02-csrf-middleware-blocks-pure-bearer--swagger-api-clients)** | 🔴 `BLOCKER` | Security / Architecture | `CsrfMiddleware` unconditionally rejects requests without session cookies, breaking Swagger and API clients | 🟢 Resolved | Gateway `CsrfMiddleware.cs` |
+| **[CR-03](file:///home/savindust/Documents/projects/lms%202.0/CODE_REVIEW_FINDINGS.md#cr-03-concurrency-race--redundant-queries-in-tokenrefreshcoordinator)** | 🟡 `WARNING` | Concurrency / Perf | `TokenRefreshCoordinator` lacks single-flight Task memoization, causing duplicate refreshes and lock races | ⏳ Open | Gateway `TokenRefreshCoordinator.cs` |
+| **[CR-04](file:///home/savindust/Documents/projects/lms%202.0/CODE_REVIEW_FINDINGS.md#cr-04-premature-session-cookie-deletion-on-transient-errors)** | 🟡 `WARNING` | Robustness / Resiliency | `BffTokenInjectionMiddleware` clears `lms_session` cookie on transient 5xx / network glitches | ⏳ Open | Gateway `BffTokenInjectionMiddleware.cs` |
+| **[CR-05](file:///home/savindust/Documents/projects/lms%202.0/CODE_REVIEW_FINDINGS.md#cr-05-discrepancy-in-fallback-jwt-secret-keys)** | 🟡 `WARNING` | Configuration / Auth | Discrepancy between default fallback keys in `TokenService.cs` vs. `Gateway/Program.cs` | ⏳ Open | `TokenService.cs` & `Gateway/Program.cs` |
+| **[CR-06](file:///home/savindust/Documents/projects/lms%202.0/CODE_REVIEW_FINDINGS.md#cr-06-dry-session-cookie-attachment-in-gateway)** | 💡 `SUGGESTION` | Maintainability | Duplicate boilerplate in `/api/auth/login` and `/api/auth/register` endpoints in Gateway | ⏳ Open | Gateway `Program.cs` |
+| **[CR-07](file:///home/savindust/Documents/projects/lms%202.0/CODE_REVIEW_FINDINGS.md#cr-07-implement-periodic-refresh-token-pruning)** | 💡 `SUGGESTION` | Database / Storage | Supabase PostgreSQL `RefreshTokens` table lacks TTL / background pruning for revoked tokens | ⏳ Open | `AppDbContext.cs` / Worker Service |
+| **[CR-08](file:///home/savindust/Documents/projects/lms%202.0/CODE_REVIEW_FINDINGS.md#cr-08-perimeter-test-suite-and-csrf-observability)** | 💡 `SUGGESTION` | Testability / Ops | Zero unit/integration tests for `Lms.Gateway` and missing structured logs on CSRF rejection | ⏳ In Progress | `CsrfMiddleware.cs` & Gateway Tests |
 
 ---
 
@@ -50,6 +86,7 @@
 
 ### 5. Documentation & Repository Security
 - [x] Added comprehensive project root `README.md` with system architecture diagrams, getting started steps, and credentials.
+- [x] Created comprehensive Architecture Decision Records in `ARCHITECTURE_DECISIONS.md` documenting ADR-001 through ADR-010.
 - [x] Hardened `.gitignore` to prevent leaking `.env`, Supabase passwords, binaries (`bin/`, `obj/`), or user uploads.
 - [x] Created `.agents/rules/git-workflow.md` and `AGENTS.md` enforcing strict non-autonomous commit policy.
 
@@ -105,6 +142,18 @@
   - Fully eliminated all `lms_token` references and client-side token storage.
   - Verified with Angular Vitest unit tests (100% pass) and Docker multi-container redeployment.
 
+### 9. BFF Code Review Remediations & Perimeter Security Hardening
+- [x] **CR-01 Resolved (Angular Cross-Origin Anti-CSRF Token Suppression):**
+  - Updated `frontend/src/app/core/interceptors/auth.interceptor.ts` with `getXsrfCookie()` helper to extract and decode `XSRF-TOKEN` cookie from `document.cookie`.
+  - Injected `X-XSRF-TOKEN` header on all mutating requests (`POST`, `PUT`, `DELETE`, `PATCH`) targeting backend API endpoints (`http://localhost:5000` or `/api`).
+  - Removed same-origin-only `withXsrfConfiguration` from `frontend/src/app/app.config.ts`.
+  - Created 10 targeted unit tests in `auth.interceptor.spec.ts` (12/12 Angular tests passing, production build verified).
+- [x] **CR-02 Resolved (CSRF Middleware Pure Bearer & Swagger Bypass):**
+  - Updated `backend/Lms.Gateway/Middleware/CsrfMiddleware.cs` to check `if (!context.Request.Cookies.ContainsKey("lms_session"))` before enforcing CSRF checks.
+  - Unblocked Swagger UI, curl, mobile clients, and automated API callers using `Authorization: Bearer <jwt>`.
+  - Preserved strict Double-Submit constant-time CSRF enforcement for all browser sessions bearing `lms_session`.
+  - Added project reference from `Lms.Tests` to `Lms.Gateway` and added 11 unit tests in `CsrfMiddlewareTests.cs` (22/22 backend tests passing).
+
 ---
 
 ## 🚧 Current In-Progress / Next Focus
@@ -140,6 +189,10 @@
 
 | Date | Contributor / Agent | Action & Summary | Status |
 | :--- | :--- | :--- | :--- |
+| **2026-09-22** | Agent | Resolved Blocker CR-02: Unblocked Swagger UI and pure Bearer API clients from CSRF middleware in Gateway. Updated `CsrfMiddleware.cs` to only enforce Double-Submit token verification when the ambient `lms_session` cookie is present, referenced `Lms.Gateway` in `Lms.Tests`, added unit tests in `CsrfMiddlewareTests.cs` (22/22 tests passing), and verified clean solution build. | Completed |
+| **2026-09-22** | Agent | Resolved Blocker CR-01: Fixed cross-origin Anti-CSRF token suppression in Angular frontend. Implemented manual `XSRF-TOKEN` cookie extraction and `X-XSRF-TOKEN` header attachment on mutating requests in `auth.interceptor.ts`, cleaned up `app.config.ts`, added comprehensive Vitest unit test suite (12 tests passing), and verified clean production build. | Completed |
+| **2026-09-22** | Agent | Completed 5-Axis Code Review across Correctness, Readability, Architecture, Security, and Testability. Created `CODE_REVIEW_FINDINGS.md` detailing 2 Blockers, 3 Warnings, and 3 Suggestions with remediation diffs. | Completed |
+| **2026-09-22** | Agent | Created `ARCHITECTURE_DECISIONS.md` documenting 10 key Architecture Decision Records (ADRs) covering Clean Architecture, YARP gateway, BFF pattern, token rotation, Supabase PostgreSQL, bank transfer verification, Angular 22 signals, anti-CSRF, file storage, and Docker multi-stage isolation. | Completed |
 | **2026-09-22** | Agent | Completed Milestone 8: Enterprise BFF Pattern with HttpOnly encrypted session cookies, 15m/7d refresh token rotation with 30s grace period, YARP gateway token injection & deduplication, Double-Submit Anti-CSRF protection, and Angular APP_INITIALIZER session bootstrapping. | Completed |
 | **2026-09-22** | Agent | Removed top-of-page topic badges with bullet points throughout the frontend (`login.ts`, `register.ts`, `my-courses.ts`, `invoices.ts`, `bank-verification.ts`, `gradebook.ts`, `student-roster.ts`), verified clean build and unit tests, and updated Docker frontend image. | Completed |
 | **2026-09-22** | Agent | Removed homepage header pill badge ('Official Online Academy • Academy Instructor'), disabled build-time font inlining in `angular.json` for resilient offline compilation, rebuilt and deployed Docker frontend. | Completed |

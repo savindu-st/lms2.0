@@ -57,7 +57,14 @@ public class CsrfMiddleware
             return;
         }
 
-        // 3. For state-changing requests (POST, PUT, DELETE, PATCH), validate CSRF header vs cookie
+        // 3. Only enforce CSRF verification when request uses ambient cookie session
+        if (!context.Request.Cookies.ContainsKey("lms_session"))
+        {
+            await _next(context);
+            return;
+        }
+
+        // 4. For state-changing requests using cookie session, validate CSRF header vs cookie
         if (!context.Request.Cookies.TryGetValue("XSRF-TOKEN", out var cookieToken) ||
             !context.Request.Headers.TryGetValue("X-XSRF-TOKEN", out var headerToken) ||
             string.IsNullOrWhiteSpace(cookieToken) ||

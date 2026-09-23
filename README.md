@@ -6,7 +6,7 @@ A modern, high-performance **Accounting Learning Management System** built with 
 
 ## 🏗️ System Architecture
 
-The backend implements **Clean Architecture (Ports and Adapters)** fronted by a dedicated **YARP Edge API Gateway**.
+The backend implements **Clean Architecture (Ports and Adapters)** fronted by a dedicated **YARP Edge API Gateway**. Comprehensive Architecture Decision Records (ADRs) are documented in [`ARCHITECTURE_DECISIONS.md`](ARCHITECTURE_DECISIONS.md).
 
 ```mermaid
 graph TD
